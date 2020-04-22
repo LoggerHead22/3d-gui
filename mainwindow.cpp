@@ -48,7 +48,7 @@ struct DDD {
         : DDD(painter, widget, 0.1, 1000, 70, eye, center)
     {}
 
-    // проецирует точку из нормированной системы координат в систему координат painter'a
+    // проецирует точку из нормированной системы координат (НСК) в систему координат painter'a
     QPointF project(const QVector3D& p) {
         QVector4D q(p, 1);
         q = transform * q;
@@ -77,7 +77,7 @@ struct DDD {
     }
 
     // рисует оси, числа на осях, сетку
-    //     size: размер графика в нормированной системе координат
+    //     size: размер графика в НСК
     //     *Range: диапазон значений по оси *
     //     n_*_points: количество точек на оси *
     void drawAxes(const QVector3D& size,
@@ -102,7 +102,7 @@ struct DDD {
         const double yDiff = yRange.second - yRange.first;
         const double zDiff = zRange.second - zRange.first;
 
-        // переводит точку из системы координат графика в нормированную систему кооординат
+        // переводит точку из системы координат графика в НСК
         auto toNdc = [&](const QVector3D& p) {
             float x = a.x() + (d.x() - a.x()) * ((p.x() - xRange.first) / xDiff);
             float y = a.y() + (e.y() - a.y()) * ((p.y() - yRange.first) / yDiff);
@@ -120,42 +120,42 @@ struct DDD {
         drawLine(b, f);
         drawLine(c, g);
 
-        // отступы для текста (чтобы буковки не наезжали на оси)
-        const QVector3D xTextOffset(0, 0, -0.1);
-        const QVector3D yTextOffset(-0.1, 0, 0.1);
-        const QVector3D zTextOffset(0.1, 0, 0);
+        // отступы в НСК для текста (чтобы буковки не наезжали на оси)
+        const QVector3D xTextOffset(0, 0, -0.15);
+        const QVector3D yTextOffset(-0.15, 0, 0.15);
+        const QVector3D zTextOffset(0.15, 0, 0);
 
         // точки на Ox & часть сетки
         for (double i = 0, x = xRange.first; i < n_x_points; i++, x += xDiff / n_x_points) {
-            QVector3D a(x, yRange.first, zRange.first);
-            QVector3D b(x, yRange.first, zRange.second);
-            drawText(toNdc(a) + xTextOffset, QString::number(x));
+            QVector3D begin(x, yRange.first, zRange.first);
+            QVector3D end(x, yRange.first, zRange.second);
+            drawText(toNdc(begin) + xTextOffset, QString::number(x));
             painter.setPen(QPen(Qt::DotLine));
-            drawLine(toNdc(a), toNdc(b));
+            drawLine(toNdc(begin), toNdc(end));
         }
 
         // точки на Oz & часть сетки
         for (double i = 0, z = zRange.first; i < n_z_points; i++, z += zDiff / n_z_points) {
-            QVector3D a(xRange.second, yRange.first, z);
-            QVector3D b(xRange.first, yRange.first, z);
-            drawText(toNdc(a) + zTextOffset, QString::number(z));
+            QVector3D begin(xRange.second, yRange.first, z);
+            QVector3D end(xRange.first, yRange.first, z);
+            drawText(toNdc(begin) + zTextOffset, QString::number(z));
             painter.setPen(QPen(Qt::DotLine));
-            drawLine(toNdc(a), toNdc(b));
+            drawLine(toNdc(begin), toNdc(end));
         }
 
         // отрисовка Ox, если требуется
         if (xRange.first * xRange.second <= 0) {
             painter.setPen(Qt::red);
-            QVector3D a(0, yRange.first, zRange.first);
-            QVector3D b(0, yRange.first, zRange.second);
-            drawLine(toNdc(a), toNdc(b));
+            QVector3D begin(0, yRange.first, zRange.first);
+            QVector3D end(0, yRange.first, zRange.second);
+            drawLine(toNdc(begin), toNdc(end));
         }
         // отрисовка Oz, если требуется
         if (zRange.first * zRange.second <= 0) {
             painter.setPen(Qt::red);
-            QVector3D a(xRange.first, yRange.first, 0);
-            QVector3D b(xRange.second, yRange.first, 0);
-            drawLine(toNdc(a), toNdc(b));
+            QVector3D begin(xRange.first, yRange.first, 0);
+            QVector3D end(xRange.second, yRange.first, 0);
+            drawLine(toNdc(begin), toNdc(end));
         }
         painter.setPen(Qt::black);
     }
