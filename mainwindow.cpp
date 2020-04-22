@@ -54,13 +54,16 @@ struct DDD {
         return q.toPointF();
     }
 
-    void drawTriangle(const QVector3D& a, const QVector3D& b, const QVector3D& c) {
+    void drawLine(const QVector3D& a, const QVector3D& b) {
         QPointF t = project(a);
         QPointF u = project(b);
-        QPointF v = project(c);
         painter.drawLine(t, u);
-        painter.drawLine(u, v);
-        painter.drawLine(v, t);
+    }
+
+    void drawTriangle(const QVector3D& a, const QVector3D& b, const QVector3D& c) {
+        drawLine(a, b);
+        drawLine(b, c);
+        drawLine(c, a);
     }
 };
 
