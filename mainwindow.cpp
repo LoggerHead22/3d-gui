@@ -34,14 +34,14 @@ struct DDD {
         // view
         transform.scale({width / 2, height / 2, 1});
         transform.translate({1, 1, 0});
-        transform.scale({1, -1, 1});
+        transform.scale({-1, -1, -1});
 
         // projection
         transform.perspective(fov, a, zNear, zFar);
 
         // camera
-        transform.lookAt(-eye, center, {0, 1, 0});
-        transform.translate(eye);
+        transform.lookAt(eye, center, {0, 1, 0});
+        transform.translate(-eye);
     }
 
     DDD(QPainter& painter, const QWidget& widget, const QVector3D& eye, const QVector3D& center)
@@ -89,9 +89,9 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     static float a = 0;
     QMatrix4x4 rotator;
     rotator.rotate(a, {0, 1, 0});
-    QVector3D camera_position = {0, 0, -2};
+    QVector3D camera_position = {0, 1, -2};
     camera_position = rotator * camera_position;
-    a += 0.05;
+    a += 0.005;
     DDD ddd(painter, *this, camera_position, {0, 0, 0});
     painter.setBrush(Qt::black);
 
