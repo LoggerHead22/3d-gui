@@ -48,6 +48,7 @@ struct DDD {
         : DDD(painter, widget, 0.1, 1000, 70, eye, center)
     {}
 
+    // проецирует точку из нормированной системы координат в систему координат painter'a
     QPointF project(const QVector3D& p) {
         QVector4D q(p, 1);
         q = transform * q;
@@ -70,6 +71,94 @@ struct DDD {
     void drawPoint(const QVector3D& a, float r) {
         painter.drawEllipse(project(a), r, r);
     }
+
+    void drawText(const QVector3D& a, const QString& text) {
+        painter.drawText(project(a), text);
+    }
+
+    // рисует оси, числа на осях, сетку
+    //     size: размер графика в нормированной системе координат
+    //     *Range: диапазон значений по оси *
+    //     n_*_points: количество точек на оси *
+    void drawAxes(const QVector3D& size,
+                  const QPair<double, double>& xRange, int n_x_points,
+                  const QPair<double, double>& yRange, int n_y_points,
+                  const QPair<double, double>& zRange, int n_z_points)
+    {
+        QVector3D ex = {size.x(), 0, 0};
+        const QVector3D ey = {0, size.y(), 0};
+        const QVector3D ez = {0, 0, size.z()};
+
+        const QVector3D a = -size / 2;
+        const QVector3D b = a + ez;
+        const QVector3D c = b + ex;
+        const QVector3D d = c - ez;
+        const QVector3D e = a + ey;
+        const QVector3D f = b + ey;
+        const QVector3D g = c + ey;
+        const QVector3D h = d + ey;
+
+        const double xDiff = xRange.second - xRange.first;
+        const double yDiff = yRange.second - yRange.first;
+        const double zDiff = zRange.second - zRange.first;
+
+        // переводит точку из системы координат графика в нормированную систему кооординат
+        auto toNdc = [&](const QVector3D& p) {
+            float x = a.x() + (d.x() - a.x()) * ((p.x() - xRange.first) / xDiff);
+            float y = a.y() + (e.y() - a.y()) * ((p.y() - yRange.first) / yDiff);
+            float z = a.z() + (b.z() - a.z()) * ((p.z() - zRange.first) / zDiff);
+            return QVector3D(x, y, z);
+        };
+
+        // границы графика
+        drawLine(a, b);
+        drawLine(b, c);
+        drawLine(c, d);
+        drawLine(d, a);
+
+        drawLine(a, e);
+        drawLine(b, f);
+        drawLine(c, g);
+
+        // отступы для текста (чтобы буковки не наезжали на оси)
+        const QVector3D xTextOffset(0, 0, -0.1);
+        const QVector3D yTextOffset(-0.1, 0, 0.1);
+        const QVector3D zTextOffset(0.1, 0, 0);
+
+        // точки на Ox & часть сетки
+        for (double i = 0, x = xRange.first; i < n_x_points; i++, x += xDiff / n_x_points) {
+            QVector3D a(x, yRange.first, zRange.first);
+            QVector3D b(x, yRange.first, zRange.second);
+            drawText(toNdc(a) + xTextOffset, QString::number(x));
+            painter.setPen(QPen(Qt::DotLine));
+            drawLine(toNdc(a), toNdc(b));
+        }
+
+        // точки на Oz & часть сетки
+        for (double i = 0, z = zRange.first; i < n_z_points; i++, z += zDiff / n_z_points) {
+            QVector3D a(xRange.second, yRange.first, z);
+            QVector3D b(xRange.first, yRange.first, z);
+            drawText(toNdc(a) + zTextOffset, QString::number(z));
+            painter.setPen(QPen(Qt::DotLine));
+            drawLine(toNdc(a), toNdc(b));
+        }
+
+        // отрисовка Ox, если требуется
+        if (xRange.first * xRange.second <= 0) {
+            painter.setPen(Qt::red);
+            QVector3D a(0, yRange.first, zRange.first);
+            QVector3D b(0, yRange.first, zRange.second);
+            drawLine(toNdc(a), toNdc(b));
+        }
+        // отрисовка Oz, если требуется
+        if (zRange.first * zRange.second <= 0) {
+            painter.setPen(Qt::red);
+            QVector3D a(xRange.first, yRange.first, 0);
+            QVector3D b(xRange.second, yRange.first, 0);
+            drawLine(toNdc(a), toNdc(b));
+        }
+        painter.setPen(Qt::black);
+    }
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -89,31 +178,13 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     static float a = 0;
     QMatrix4x4 rotator;
     rotator.rotate(a, {0, 1, 0});
-    QVector3D camera_position = {0, 1, -2};
+    QVector3D camera_position = {0, 0.7, -2};
     camera_position = rotator * camera_position;
-    a += 0.005;
+    a -= 0.005;
     DDD ddd(painter, *this, camera_position, {0, 0, 0});
     painter.setBrush(Qt::black);
 
-    QVector<QVector3D> cube = {
-        QVector3D(0.0, 0.0, 0.0), QVector3D(0.0, 1.0, 0.0), QVector3D(1.0, 1.0, 0.0),
-        QVector3D(0.0, 0.0, 0.0), QVector3D(1.0, 1.0, 0.0), QVector3D(1.0, 0.0, 0.0),
-        QVector3D(1.0, 0.0, 0.0), QVector3D(1.0, 1.0, 0.0), QVector3D(1.0, 1.0, 1.0),
-        QVector3D(1.0, 0.0, 0.0), QVector3D(1.0, 1.0, 1.0), QVector3D(1.0, 0.0, 1.0),
-        QVector3D(1.0, 0.0, 1.0), QVector3D(1.0, 1.0, 1.0), QVector3D(0.0, 1.0, 1.0),
-        QVector3D(1.0, 0.0, 1.0), QVector3D(0.0, 1.0, 1.0), QVector3D(0.0, 0.0, 1.0),
-        QVector3D(0.0, 0.0, 1.0), QVector3D(0.0, 1.0, 1.0), QVector3D(0.0, 1.0, 0.0),
-        QVector3D(0.0, 0.0, 1.0), QVector3D(0.0, 1.0, 0.0), QVector3D(0.0, 0.0, 0.0),
-        QVector3D(0.0, 1.0, 0.0), QVector3D(0.0, 1.0, 1.0), QVector3D(1.0, 1.0, 1.0),
-        QVector3D(0.0, 1.0, 0.0), QVector3D(1.0, 1.0, 1.0), QVector3D(1.0, 1.0, 0.0),
-        QVector3D(1.0, 0.0, 1.0), QVector3D(0.0, 0.0, 1.0), QVector3D(0.0, 0.0, 0.0),
-        QVector3D(1.0, 0.0, 1.0), QVector3D(0.0, 0.0, 0.0), QVector3D(1.0, 0.0, 0.0),
-    };
-
-    for (int i = 0; i < cube.size(); i += 3) {
-        ddd.drawTriangle(cube[i], cube[i + 1], cube[i + 2]);
-        ddd.drawPoint({1, 1, 1}, 5);
-    }
+    ddd.drawAxes({3, 3, 3}, {-1, 5}, 5, {-5, 0}, 4, {-1, 5}, 4);
 
     update();
 }
