@@ -8,6 +8,7 @@
 #include <QVector4D>
 #include <QDebug>
 #include <QTime>
+#include <QPair>
 
 struct DDD {
     QPainter& painter;
@@ -65,6 +66,10 @@ struct DDD {
         drawLine(b, c);
         drawLine(c, a);
     }
+
+    void drawPoint(const QVector3D& a, float r) {
+        painter.drawEllipse(project(a), r, r);
+    }
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -88,6 +93,7 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     camera_position = rotator * camera_position;
     a += 0.05;
     DDD ddd(painter, *this, camera_position, {0, 0, 0});
+    painter.setBrush(Qt::black);
 
     QVector<QVector3D> cube = {
         QVector3D(0.0, 0.0, 0.0), QVector3D(0.0, 1.0, 0.0), QVector3D(1.0, 1.0, 0.0),
@@ -106,6 +112,7 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
 
     for (int i = 0; i < cube.size(); i += 3) {
         ddd.drawTriangle(cube[i], cube[i + 1], cube[i + 2]);
+        ddd.drawPoint({1, 1, 1}, 5);
     }
 
     update();
