@@ -31,6 +31,9 @@ public:
     void setHorizontalAngle(int angle);
     void setVerticalAngle(int angle);
     void setZoom(int zoom);
+    void setParallelogram();
+    void activate();
+    void deactivate();
     void redraw();
     int compute();
 

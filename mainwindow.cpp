@@ -56,18 +56,27 @@ void MainWindow::setZoom(int zoom_) {
     redraw();
 }
 
-void MainWindow::redraw() {
-    update();
-}
-
-int MainWindow::compute() {
+void MainWindow::setParallelogram() {
     l1 = ui->l1LineEdit->text().toDouble();
     l2 = ui->l2LineEdit->text().toDouble();
     alpha = ui->alphaLineEdit->text().toDouble();
     k = ui->kLineEdit->text().toDouble();
     nx = ui->nxLineEdit->text().toInt();
     ny = ui->nyLineEdit->text().toInt();
+    compute();
+}
 
-    redraw();
-    return 0;
+void MainWindow::activate() {
+    ui->computePushButton->setEnabled(true);
+}
+
+void MainWindow::deactivate() {
+    ui->computePushButton->setEnabled(false);
+}
+
+void MainWindow::redraw() {
+    update();
+}
+
+int MainWindow::compute() {
 }
