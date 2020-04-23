@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "mls.h"
 
 struct Triangle {
     QVector3D p0, p1, p2;
@@ -241,6 +242,7 @@ void MainWindow::redraw() {
     update();
 }
 
-void MainWindow::compute() {
+int MainWindow::compute() {
     redraw();
+    return 0;
 }

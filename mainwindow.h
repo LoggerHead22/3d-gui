@@ -33,7 +33,7 @@ public:
     void setVerticalAngle(int angle);
     void redraw();
 
-    void compute();
+    int compute();
 
     int horizontalAngle = 0, verticalAngle = 0;
 
