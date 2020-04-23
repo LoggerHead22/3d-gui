@@ -1,15 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#define _USE_MATH_DEFINES
-#include <cmath>
-#include <vector>
-#include <QPainter>
-#include <QMatrix4x4>
-#include <QVector3D>
-#include <QVector4D>
-#include <QDebug>
-#include <QTime>
-#include <QPair>
 
 struct Triangle {
     QVector3D p0, p1, p2;
@@ -61,8 +51,8 @@ struct DDD {
         transform.translate(-eye);
     }
 
-    DDD(QPainter& painter, const QWidget& widget, const QVector3D& eye, const QVector3D& center)
-        : DDD(painter, widget, 0.1, 1000, 70, eye, center, {0, -1, 0})
+    DDD(QPainter& painter, const QWidget& widget, const QVector3D& eye)
+        : DDD(painter, widget, 0.1, 1000, 70, eye, {0, 0, 0}, {0, -1, 0})
     {}
 
     // проецирует точку из нормированной системы координат (НСК) в систему координат painter'a
@@ -222,20 +212,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
     QPainter painter(this);
-    painter.fillRect(0, 0, width(), height(), QColor(255, 128, 64));
-    static float a = 0;
-    QMatrix4x4 rotator;
-    rotator.rotate(a, {0, 1, 0});
-    QVector3D camera_position = {0, 0.7, -2};
-    camera_position = rotator * camera_position;
-    a -= 0.007;
-    DDD ddd(painter, *this, camera_position, {0, 0, 0});
-    painter.setBrush(Qt::black);
-
-    ddd.drawAxes({3, 3, 3}, {-5, 5}, 10, {-5, 5}, 10, {-5, 5}, 10);
-    std::vector<Triangle> tris = {Triangle({0, 0.75, -1.5}, {0, 1.5, -1.5}, {1.5, 1.5, -1.5}),
-                                  Triangle({0, 0.75, 0}, {0, 1.5, 1.5}, {1.5, 1.5, 1.5})};
-    ddd.drawTriangles(tris);
-
+    DDD ddd(painter, *this, eye);
     update();
 }
