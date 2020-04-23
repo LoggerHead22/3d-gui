@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <vector>
 #include <QPainter>
 #include <QMatrix4x4>
 #include <QVector3D>
@@ -9,6 +10,20 @@
 #include <QDebug>
 #include <QTime>
 #include <QPair>
+
+struct Triangle {
+    QVector3D p0, p1, p2;
+
+    Triangle(const QVector3D& p0, const QVector3D& p1, const QVector3D& p2)
+        : p0(p0)
+        , p1(p1)
+        , p2(p2)
+    {}
+
+    QVector3D center() const {
+        return (p0 + p1 + p2) / 3;
+    }
+};
 
 struct DDD {
     QPainter& painter;
@@ -19,8 +34,9 @@ struct DDD {
     const float a;
     const QVector3D eye, center;
     QMatrix4x4 transform;
+    const QVector3D light;
 
-    DDD(QPainter& painter, const QWidget& widget, float zNear, float zFar, float fov, const QVector3D& eye, const QVector3D& center)
+    DDD(QPainter& painter, const QWidget& widget, float zNear, float zFar, float fov, const QVector3D& eye, const QVector3D& center, const QVector3D& light)
         : painter(painter)
         , zNear(zNear)
         , zFar(zFar)
@@ -30,6 +46,7 @@ struct DDD {
         , a(width / height)
         , eye(eye)
         , center(center)
+        , light(-light)
     {
         // view
         transform.scale({width / 2, height / 2, 1});
@@ -45,7 +62,7 @@ struct DDD {
     }
 
     DDD(QPainter& painter, const QWidget& widget, const QVector3D& eye, const QVector3D& center)
-        : DDD(painter, widget, 0.1, 1000, 70, eye, center)
+        : DDD(painter, widget, 0.1, 1000, 70, eye, center, {0, -1, 0})
     {}
 
     // проецирует точку из нормированной системы координат (НСК) в систему координат painter'a
@@ -66,6 +83,13 @@ struct DDD {
         drawLine(a, b);
         drawLine(b, c);
         drawLine(c, a);
+    }
+
+    void fillTriangle(const QVector3D& a, const QVector3D& b, const QVector3D& c) {
+        QPainterPath path;
+        QVector<QPointF> poly = {project(a), project(b), project(c)};
+        path.addPolygon(poly);
+        painter.drawPath(path);
     }
 
     void drawPoint(const QVector3D& a, float r) {
@@ -165,6 +189,23 @@ struct DDD {
         }
         painter.setPen(Qt::black);
     }
+
+    void drawTriangles(std::vector<Triangle> triangles) {
+        for (const auto& it : triangles) {
+            const QVector3D& p0 = it.p0;
+            const QVector3D& p1 = it.p1;
+            const QVector3D& p2 = it.p2;
+
+            QVector3D normal = QVector3D::crossProduct(p1 - p0, p2 - p0);
+            normal.normalize();
+
+            float intensity = QVector3D::dotProduct(normal, light);
+            intensity = qMax(0.f, intensity);
+            painter.setBrush(QColor(intensity * 255, intensity * 255, intensity * 255));
+            fillTriangle(p0, p1, p2);
+        }
+        painter.setBrush(Qt::black);
+    }
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -181,16 +222,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
     QPainter painter(this);
+    painter.fillRect(0, 0, width(), height(), QColor(255, 128, 64));
     static float a = 0;
     QMatrix4x4 rotator;
     rotator.rotate(a, {0, 1, 0});
     QVector3D camera_position = {0, 0.7, -2};
     camera_position = rotator * camera_position;
-    a -= 0.005;
+    a -= 0.007;
     DDD ddd(painter, *this, camera_position, {0, 0, 0});
     painter.setBrush(Qt::black);
 
     ddd.drawAxes({3, 3, 3}, {-5, 5}, 10, {-5, 5}, 10, {-5, 5}, 10);
+    std::vector<Triangle> tris = {Triangle({0, 0.75, -1.5}, {0, 1.5, -1.5}, {1.5, 1.5, -1.5}),
+                                  Triangle({0, 0.75, 0}, {0, 1.5, 1.5}, {1.5, 1.5, 1.5})};
+    ddd.drawTriangles(tris);
 
     update();
 }
