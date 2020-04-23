@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QTime>
 #include <QPair>
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,7 +28,14 @@ public:
 
     void paintEvent(QPaintEvent* event) override;
 
-    QVector3D eye = {0, 0.7, -2};
+    QVector3D getEye();
+    void setHorizontalAngle(int angle);
+    void setVerticalAngle(int angle);
+    void redraw();
+
+    void compute();
+
+    int horizontalAngle = 0, verticalAngle = 0;
 
 private:
     Ui::MainWindow *ui;
