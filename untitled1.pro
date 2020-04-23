@@ -21,8 +21,10 @@ SOURCES += \
     mls_apr.cpp
 
 HEADERS += \
+    DDD.h \
     mainwindow.h \
-    mls.h
+    mls.h \
+    triangle.h
 
 FORMS += \
     mainwindow.ui
