@@ -27,14 +27,14 @@ public:
     ~MainWindow();
 
     void paintEvent(QPaintEvent* event) override;
-
     QVector3D getEye();
     void setHorizontalAngle(int angle);
     void setVerticalAngle(int angle);
+    void setZoom(int zoom);
     void redraw();
-
     int compute();
 
+    float zoom = 1;
     int horizontalAngle = 0, verticalAngle = 0;
 
 private:
