@@ -36,6 +36,8 @@ public:
 
     float zoom = 1;
     int horizontalAngle = 0, verticalAngle = 0;
+    double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
+    int nx = 6, ny = 12;
 
 private:
     Ui::MainWindow *ui;

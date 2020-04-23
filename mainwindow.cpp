@@ -12,6 +12,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::setHorizontalAngle);
     connect(ui->verticalSlider, &QSlider::valueChanged, this, &MainWindow::setVerticalAngle);
     connect(ui->zoomSlider, &QSlider::valueChanged, this, &MainWindow::setZoom);
+
+    ui->l1LineEdit->setText(QString::number(l1));
+    ui->l2LineEdit->setText(QString::number(l2));
+    ui->alphaLineEdit->setText(QString::number(alpha));
+    ui->kLineEdit->setText(QString::number(k));
+    ui->nxLineEdit->setText(QString::number(nx));
+    ui->nyLineEdit->setText(QString::number(ny));
+    connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::compute);
 }
 
 MainWindow::~MainWindow()
@@ -53,6 +61,13 @@ void MainWindow::redraw() {
 }
 
 int MainWindow::compute() {
+    l1 = ui->l1LineEdit->text().toDouble();
+    l2 = ui->l2LineEdit->text().toDouble();
+    alpha = ui->alphaLineEdit->text().toDouble();
+    k = ui->kLineEdit->text().toDouble();
+    nx = ui->nxLineEdit->text().toInt();
+    ny = ui->nyLineEdit->text().toInt();
+
     redraw();
     return 0;
 }
