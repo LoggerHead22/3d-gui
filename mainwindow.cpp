@@ -121,9 +121,9 @@ struct DDD {
         drawLine(c, g);
 
         // отступы в НСК для текста (чтобы буковки не наезжали на оси)
-        const QVector3D xTextOffset(0, 0, -0.15);
-        const QVector3D yTextOffset(-0.15, 0, 0.15);
-        const QVector3D zTextOffset(0.15, 0, 0);
+        const QVector3D xTextOffset(0, 0, -0.2);
+        const QVector3D yTextOffset(-0.2, 0, -0.2);
+        const QVector3D zTextOffset(0.2, 0, 0);
 
         // точки на Ox & часть сетки
         for (double i = 0, x = xRange.first; i < n_x_points; i++, x += xDiff / n_x_points) {
@@ -132,6 +132,12 @@ struct DDD {
             drawText(toNdc(begin) + xTextOffset, QString::number(x));
             painter.setPen(QPen(Qt::DotLine));
             drawLine(toNdc(begin), toNdc(end));
+        }
+
+        // точки на Oy
+        for (double i = 0, y = yRange.first; i < n_y_points; i++, y += yDiff / n_y_points) {
+            QVector3D begin(xRange.first, y, zRange.first);
+            drawText(toNdc(begin) + yTextOffset, QString::number(y));
         }
 
         // точки на Oz & часть сетки
@@ -184,7 +190,7 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     DDD ddd(painter, *this, camera_position, {0, 0, 0});
     painter.setBrush(Qt::black);
 
-    ddd.drawAxes({3, 3, 3}, {-1, 5}, 5, {-5, 0}, 4, {-1, 5}, 4);
+    ddd.drawAxes({3, 3, 3}, {-5, 5}, 10, {-5, 5}, 10, {-5, 5}, 10);
 
     update();
 }
