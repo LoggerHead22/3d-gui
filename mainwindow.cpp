@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "mls.h"
 #include "DDD.h"
 #include "approx.h"
 
@@ -60,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    freeThreadVars();
 }
 
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
@@ -155,8 +155,61 @@ void MainWindow::redraw() {
 }
 
 int MainWindow::compute() {
-    approx(l1, l2, alpha, k, nx, ny, p, currentFunction());
+    allocThreadVars();
+    approx(p, tids, args);
 
     redraw();
     return 0;
+}
+
+void MainWindow::allocThreadVars() {
+    freeThreadVars();
+
+    error = new int(0);
+    par = parral(l1 , l2 , alpha, k , nx, ny);
+
+    N = (nx + 1)*(ny + 1) - par.nx_rect*par.ny_rect;
+
+    tids= new pthread_t[p];
+    args= new Arg[p];
+    buf = new double[p];
+    x = new double[N];
+    u = new double[N];
+    v = new double[N];
+    r = new double[N];
+
+    memset(x , 0 , N*sizeof(double));
+    memset(u , 0 , N*sizeof(double));
+    memset(v , 0 , N*sizeof(double));
+    memset(r , 0 , N*sizeof(double));
+    memset(buf , 0 , p*sizeof(double));
+
+    for(int i=0;i<p;i++){
+        args[i].p=p;
+        args[i].thr_ind=i;
+        args[i].A=&a;
+        args[i].b=&b;
+        args[i].I=&I;
+        args[i].x=x;
+        args[i].u=u;
+        args[i].v=v;
+        args[i].r=r;
+        args[i].buf = buf;
+        args[i].error=error;
+        args[i].nx = par.nx;
+        args[i].ny = par.ny;
+        args[i].f = currentFunction();
+        args[i].par = &par;
+    }
+}
+
+void MainWindow::freeThreadVars() {
+    delete[] tids;
+    delete[] args;
+    delete[] x;
+    delete[] u;
+    delete[] v;
+    delete[] r;
+    delete[] buf;
+    delete error;
 }

@@ -14,6 +14,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QPair>
+#include "mls.h"
 using namespace std;
 
 QT_BEGIN_NAMESPACE
@@ -63,6 +64,18 @@ public:
     QVector<QPair<double(*)(double, double), QString>> functions;
     int currentFunctionIndex = 0;
     QTimer computeTimer;
+
+    // потоки
+    int *error = nullptr;
+    parral par;
+    double *a=nullptr, *b=nullptr, *x=nullptr , *v=nullptr , *u=nullptr , *r=nullptr , *buf=nullptr ;
+    int * I=nullptr;
+    pthread_t *tids=nullptr;
+    Arg *args=nullptr;
+    int N;
+
+    void allocThreadVars();
+    void freeThreadVars();
 
 private:
     Ui::MainWindow *ui;
