@@ -12,7 +12,7 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QDebug>
-#include <QTime>
+#include <QTimer>
 #include <QPair>
 using namespace std;
 
@@ -56,12 +56,13 @@ public:
     float zoom = 1;
     int horizontalAngle = 0, verticalAngle = 0;
 
-    // параллелограм
+    // апроксимация
     double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
     int nx = 6, ny = 12;
     int p = 1;
     QVector<QPair<double(*)(double, double), QString>> functions;
     int currentFunctionIndex = 0;
+    QTimer computeTimer;
 
 private:
     Ui::MainWindow *ui;

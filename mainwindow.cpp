@@ -50,6 +50,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->nyLineEdit->setText(QString::number(ny));
     ui->pLineEdit->setText(QString::number(p));
     connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::compute);
+
+    computeTimer.setInterval(1000);
+//    computeTimer.callOnTimeout(this, &MainWindow::compute);
+    computeTimer.start();
 }
 
 MainWindow::~MainWindow()
