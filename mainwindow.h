@@ -35,10 +35,13 @@ public:
     void wheelEvent(QWheelEvent* event) override;
 
     QVector3D getEye();
+    using XXX = double(*)(double, double);
+    XXX currentFunction();
     void setHorizontalAngle(int angle);
     void setVerticalAngle(int angle);
     void setZoom(float zoom_);
     void setParallelogram();
+    void setCurrentFunction(int index);
     void activate();
     void deactivate();
     void redraw();
@@ -57,6 +60,8 @@ public:
     double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
     int nx = 6, ny = 12;
     int p = 1;
+    QVector<QPair<double(*)(double, double), QString>> functions;
+    int currentFunctionIndex = 0;
 
 private:
     Ui::MainWindow *ui;

@@ -3,11 +3,44 @@
 #include "mls.h"
 #include "DDD.h"
 
+double f_1(double , double){
+    return 1;
+}
+double f_2(double x, double){
+    return x;
+}
+double f_3(double , double y){
+    return y;
+}
+double f_4(double x, double y){
+    return x + y;
+}
+
+double f_5(double x, double y){
+    return x*y + x*x ;
+}
+
+double f_6(double x, double y){
+    return exp(x)*exp(y);
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    functions.push_back({f_1, "f(x, y) = 1"});
+    functions.push_back({f_2, "f(x, y) = x"});
+    functions.push_back({f_3, "f(x, y) = y"});
+    functions.push_back({f_4, "f(x, y) = x + y"});
+    functions.push_back({f_5, "f(x, y) = x*y + x*x"});
+    functions.push_back({f_6, "f(x, y) = e^x * e^y"});
+
+    ui->functionLabel->setText(functions[0].second);
+    connect(ui->changeFunctionPushButton, &QPushButton::released, this, [&]() {
+        setCurrentFunction((currentFunctionIndex + 1) % functions.size());
+    });
 
     ui->l1LineEdit->setText(QString::number(l1));
     ui->l2LineEdit->setText(QString::number(l2));
@@ -56,7 +89,6 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
     setZoom(zoom + event->delta() / 4000.0);
-//    qDebug() << event->delta();
 }
 
 QVector3D MainWindow::getEye() {
@@ -64,6 +96,10 @@ QVector3D MainWindow::getEye() {
     rotator.rotate(horizontalAngle, {0, 1, 0});
     rotator.rotate(verticalAngle, {1, 0, 0});
     return rotator * QVector3D(0, 0.7, -2) / zoom;
+}
+
+MainWindow::XXX MainWindow::currentFunction() {
+    return functions[currentFunctionIndex].first;
 }
 
 void MainWindow::setHorizontalAngle(int angle) {
@@ -93,12 +129,20 @@ void MainWindow::setParallelogram() {
     compute();
 }
 
+void MainWindow::setCurrentFunction(int index) {
+    currentFunctionIndex = index;
+    ui->functionLabel->setText(functions[currentFunctionIndex].second);
+    compute();
+}
+
 void MainWindow::activate() {
     ui->computePushButton->setEnabled(true);
+    ui->changeFunctionPushButton->setEnabled(true);
 }
 
 void MainWindow::deactivate() {
     ui->computePushButton->setEnabled(false);
+    ui->changeFunctionPushButton->setEnabled(false);
 }
 
 void MainWindow::redraw() {
@@ -106,4 +150,6 @@ void MainWindow::redraw() {
 }
 
 int MainWindow::compute() {
+    redraw();
+    return 0;
 }

@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>70</y>
       <width>231</width>
       <height>206</height>
      </rect>
@@ -100,13 +100,39 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>10</y>
-      <width>71</width>
+      <y>70</y>
+      <width>121</width>
       <height>211</height>
      </rect>
     </property>
     <property name="text">
      <string>Compute</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="functionLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>301</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="changeFunctionPushButton">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>10</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Change function</string>
     </property>
    </widget>
   </widget>
