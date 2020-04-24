@@ -17,18 +17,7 @@ int approx(double l1, double l2, double alpha, double k, int nx, int ny, int p, 
     pthread_t *tids;
     Arg *args;
 
-
-
     int N = (nx + 1)*(ny + 1) - par.nx_rect*par.ny_rect;
-
-    cout<<par.nx<<" "<<par.ny<<" "<<par.nx_rect<<" "<<par.ny_rect<<endl;
-    qLog(l1);
-    qLog(l2);
-    qLog(alpha);
-    qLog(k);
-    qLog(nx);
-    qLog(ny);
-    qLog(p);
 
     tids= new pthread_t[p];
     args= new Arg[p];
@@ -64,30 +53,27 @@ int approx(double l1, double l2, double alpha, double k, int nx, int ny, int p, 
         args[i].par = &par;
     }
 
-        //double TIME = get_full_time();
+    //double TIME = get_full_time();
 
     cout<<"Lets GO"<<endl;
     for(int i=0;i<p;i++){
-           if(pthread_create(tids+i,0,&msl_approx,(void *) (args+i))){
-                    printf("Cannot create thread %d\n",i);
-                    delete[] tids;
-                    delete[] args;
-                    delete[] x;
-                    delete[] u;
-                    delete[] v;
-                    delete[] r;
-                    delete error;
-                    abort();
-            }
+        if(pthread_create(tids+i,0,&msl_approx,(void *) (args+i))){
+            printf("Cannot create thread %d\n",i);
+            delete[] tids;
+            delete[] args;
+            delete[] x;
+            delete[] u;
+            delete[] v;
+            delete[] r;
+            delete error;
+            abort();
+        }
     }
 
     for(int i=0;i<p;i++) {
         pthread_join(tids[i],0);
     }
 
-
-
-    //delete[] x;
     delete[] tids;
     delete[] args;
     delete[] x;
@@ -95,8 +81,6 @@ int approx(double l1, double l2, double alpha, double k, int nx, int ny, int p, 
     delete[] v;
     delete[] r;
     delete error;
-
-
 
     return 0;
 }

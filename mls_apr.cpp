@@ -1,4 +1,5 @@
 #include "mls.h"
+#include <QDebug>
 
 
 
@@ -337,13 +338,11 @@ void build_MSR_matrix(int nx , int ny, double*a, int *I, double *b, int p , int 
 		sum+=s;
 		// cout<<"thr: "<<k<< "L " << s <<" k"<< l<<endl;
 	}
-    cout<<"N "<<N<<" "<<sum<<" "<<k1<<" "<<k2<<endl;
+//    cout<<"N "<<N<<" "<<sum<<" "<<k1<<" "<<k2<<endl;
 
 	reduce_sum( p , &sum);
 	//pthread_barrier_wait(&barrier);
-    cout<<"2: N "<<N<<" "<<sum<<" "<<k1<<" "<<k2<<endl;
-	
-    cout<<"ASSSERT "<<sum<<" "<<I[N]<<" "<<N + 1 + sum<<endl;
+
 	assert( N + 1 + sum == I[N]);	
 }
 
