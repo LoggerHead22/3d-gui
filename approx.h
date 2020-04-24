@@ -81,7 +81,10 @@ int approx(double l1, double l2, double alpha, double k, int nx, int ny, int p, 
             }
     }
 
-    for(int i=0;i<p;i++) pthread_join(tids[i],0);
+    for(int i=0;i<p;i++) {
+        pthread_join(tids[i],0);
+        pthread_detach(tids[i]);
+    }
 
 
 
