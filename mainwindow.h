@@ -7,6 +7,7 @@
 #include <vector>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QVector4D>
@@ -31,11 +32,12 @@ public:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
 
     QVector3D getEye();
     void setHorizontalAngle(int angle);
     void setVerticalAngle(int angle);
-    void setZoom(int zoom);
+    void setZoom(float zoom_);
     void setParallelogram();
     void activate();
     void deactivate();

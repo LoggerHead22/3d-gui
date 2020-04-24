@@ -9,8 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->zoomSlider, &QSlider::valueChanged, this, &MainWindow::setZoom);
-
     ui->l1LineEdit->setText(QString::number(l1));
     ui->l2LineEdit->setText(QString::number(l2));
     ui->alphaLineEdit->setText(QString::number(alpha));
@@ -55,6 +53,11 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
+void MainWindow::wheelEvent(QWheelEvent *event) {
+    setZoom(zoom + event->delta() / 4000.0);
+//    qDebug() << event->delta();
+}
+
 QVector3D MainWindow::getEye() {
     QMatrix4x4 rotator;
     rotator.rotate(horizontalAngle, {0, 1, 0});
@@ -72,8 +75,9 @@ void MainWindow::setVerticalAngle(int angle) {
     redraw();
 }
 
-void MainWindow::setZoom(int zoom_) {
-    zoom = zoom_ / 100.0;
+void MainWindow::setZoom(float zoom_) {
+    zoom = qMax(0.3f, zoom_);
+    zoom = qMin(2.0f, zoom);
     redraw();
 }
 
