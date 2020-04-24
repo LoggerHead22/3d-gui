@@ -6,6 +6,7 @@
 #include <cmath>
 #include <vector>
 #include <QPainter>
+#include <QMouseEvent>
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QVector4D>
@@ -27,6 +28,10 @@ public:
     ~MainWindow();
 
     void paintEvent(QPaintEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+
     QVector3D getEye();
     void setHorizontalAngle(int angle);
     void setVerticalAngle(int angle);
@@ -37,8 +42,16 @@ public:
     void redraw();
     int compute();
 
+    // поворот мышкой
+    QPoint lastMousePosition;
+    bool isRotating = false;
+    float lastHorizontalAngle, lastVerticalAngle;
+
+    // камера
     float zoom = 1;
     int horizontalAngle = 0, verticalAngle = 0;
+
+    // параллелограм
     double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
     int nx = 6, ny = 12;
 

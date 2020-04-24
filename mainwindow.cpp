@@ -9,8 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::setHorizontalAngle);
-    connect(ui->verticalSlider, &QSlider::valueChanged, this, &MainWindow::setVerticalAngle);
     connect(ui->zoomSlider, &QSlider::valueChanged, this, &MainWindow::setZoom);
 
     ui->l1LineEdit->setText(QString::number(l1));
@@ -32,6 +30,29 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     DDD ddd(painter, *this, getEye());
 
     ddd.drawAxes({3, 3, 3}, {0, 10}, 2, {10, 20}, 3, {20, 30}, 4);
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::RightButton) {
+        lastMousePosition = event->pos();
+        lastHorizontalAngle = horizontalAngle;
+        lastVerticalAngle = verticalAngle;
+        isRotating = true;
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::RightButton) {
+        isRotating = false;
+    }
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event) {
+    const float sensitivity = 0.3;
+    if (isRotating) {
+        setHorizontalAngle(lastHorizontalAngle + (event->pos().x() - lastMousePosition.x()) * sensitivity);
+        setVerticalAngle(lastVerticalAngle + (event->pos().y() - lastMousePosition.y()) * sensitivity);
+    }
 }
 
 QVector3D MainWindow::getEye() {
