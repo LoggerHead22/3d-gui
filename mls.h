@@ -10,6 +10,7 @@
 #include <pthread.h>
 using namespace std;
 
+extern bool allThreadsPokushali;
 
 #define EPS 1e-15
 

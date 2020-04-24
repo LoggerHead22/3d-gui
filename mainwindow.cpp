@@ -51,15 +51,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pLineEdit->setText(QString::number(p));
     connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::setParallelogram);
 
-    computeTimer.setInterval(1000);
-//    computeTimer.callOnTimeout(this, &MainWindow::compute);
+    computeTimer.setInterval(100);
+    computeTimer.callOnTimeout(this, [&]() {
+        if (allThreadsPokushali) {
+            qDebug() << "spasipo, o4en' vkusno";
+            freeThreadVars();
+            activate();
+        }
+    });
     computeTimer.start();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    freeThreadVars();
+//    freeThreadVars();
 }
 
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
@@ -155,6 +161,7 @@ void MainWindow::redraw() {
 }
 
 int MainWindow::compute() {
+    deactivate();
     allocThreadVars();
     approx(p, tids, args);
 
@@ -163,7 +170,7 @@ int MainWindow::compute() {
 }
 
 void MainWindow::allocThreadVars() {
-    freeThreadVars();
+//    freeThreadVars();
 
     error = new int(0);
     par = parral(l1 , l2 , alpha, k , nx, ny);
@@ -204,12 +211,24 @@ void MainWindow::allocThreadVars() {
 }
 
 void MainWindow::freeThreadVars() {
-    delete[] tids;
-    delete[] args;
-    delete[] x;
-    delete[] u;
-    delete[] v;
-    delete[] r;
-    delete[] buf;
-    delete error;
+    allThreadsPokushali = false;
+//    for(int i=0;i<p;i++) {
+//        pthread_join(tids[i],0);
+//    }
+//    delete[] tids;
+//    delete[] args;
+//    delete[] x;
+//    delete[] u;
+//    delete[] v;
+//    delete[] r;
+//    delete[] buf;
+//    delete error;
+//    tids = nullptr;
+//    args = nullptr;
+//    x = nullptr;
+//    u = nullptr;
+//    v = nullptr;
+//    r = nullptr;
+//    buf = nullptr;
+//    error = nullptr;
 }

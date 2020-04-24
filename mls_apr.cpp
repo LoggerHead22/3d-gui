@@ -2,7 +2,7 @@
 #include <QDebug>
 
 
-
+bool allThreadsPokushali = false;
 
 const double tetta = 0.7;
 
@@ -518,6 +518,11 @@ void* msl_approx(void *in_arg) {
 	if(thr_ind == 0){
 		cout<<"RESIDUAL : "<<resid<<endl;
 	}
+
+    reduce_sum(p);
+    if (thr_ind == 0) {
+        allThreadsPokushali = true;
+    }
 	
 	
 	return 0 ;

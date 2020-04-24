@@ -21,9 +21,9 @@ int approx(int p, pthread_t*& tids, Arg*& args){
         }
     }
 
-    for(int i=0;i<p;i++) {
-        pthread_join(tids[i],0);
-    }
+//    for(int i=0;i<p;i++) {
+//        pthread_join(tids[i],0);
+//    }
 
     return 0;
 }
