@@ -58,7 +58,7 @@ public:
 
     // апроксимация
     double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
-    int nx = 6, ny = 12;
+    int nx = 6, ny = 8;
     int p = 1;
     QVector<QPair<double(*)(double, double), QString>> functions;
     int currentFunctionIndex = 0;

@@ -337,12 +337,13 @@ void build_MSR_matrix(int nx , int ny, double*a, int *I, double *b, int p , int 
 		sum+=s;
 		// cout<<"thr: "<<k<< "L " << s <<" k"<< l<<endl;
 	}
-	//cout<<"N "<<N<<" "<<sum<<" "<<k1<<" "<<k2<<endl;
+    cout<<"N "<<N<<" "<<sum<<" "<<k1<<" "<<k2<<endl;
 
 	reduce_sum( p , &sum);
 	//pthread_barrier_wait(&barrier);
+    cout<<"2: N "<<N<<" "<<sum<<" "<<k1<<" "<<k2<<endl;
 	
-	//cout<<"ASSSERT "<<sum<<" "<<I[N]<<" "<<N + 1 + sum<<endl;
+    cout<<"ASSSERT "<<sum<<" "<<I[N]<<" "<<N + 1 + sum<<endl;
 	assert( N + 1 + sum == I[N]);	
 }
 
@@ -378,6 +379,7 @@ void reduce_sum(int p, int *sum){
     t_out++;
     if(t_out>=p){
 			t_in = 0;
+            sums = -1;
             pthread_cond_broadcast(&c_out);
     }else while(t_out<p) pthread_cond_wait(&c_out,&mu);
     pthread_mutex_unlock(&mu);

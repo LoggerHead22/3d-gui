@@ -22,6 +22,7 @@ SOURCES += \
 
 HEADERS += \
     DDD.h \
+    approx.h \
     mainwindow.h \
     mls.h \
     triangle.h

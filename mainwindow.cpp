@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "mls.h"
 #include "DDD.h"
+#include "approx.h"
 
 double f_1(double , double){
     return 1;
@@ -49,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->nxLineEdit->setText(QString::number(nx));
     ui->nyLineEdit->setText(QString::number(ny));
     ui->pLineEdit->setText(QString::number(p));
-    connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::compute);
+    connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::setParallelogram);
 
     computeTimer.setInterval(1000);
 //    computeTimer.callOnTimeout(this, &MainWindow::compute);
@@ -154,6 +155,8 @@ void MainWindow::redraw() {
 }
 
 int MainWindow::compute() {
+    approx(l1, l2, alpha, k, nx, ny, p, currentFunction());
+
     redraw();
     return 0;
 }
