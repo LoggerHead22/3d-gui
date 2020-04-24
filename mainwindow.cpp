@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->kLineEdit->setText(QString::number(k));
     ui->nxLineEdit->setText(QString::number(nx));
     ui->nyLineEdit->setText(QString::number(ny));
+    ui->pLineEdit->setText(QString::number(p));
     connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::compute);
 }
 
@@ -88,6 +89,7 @@ void MainWindow::setParallelogram() {
     k = ui->kLineEdit->text().toDouble();
     nx = ui->nxLineEdit->text().toInt();
     ny = ui->nyLineEdit->text().toInt();
+    p = ui->pLineEdit->text().toInt();
     compute();
 }
 

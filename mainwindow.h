@@ -56,6 +56,7 @@ public:
     // параллелограм
     double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
     int nx = 6, ny = 12;
+    int p = 1;
 
 private:
     Ui::MainWindow *ui;
