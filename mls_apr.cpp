@@ -200,7 +200,7 @@ int get_offdiag_elem( int nx , int ny , int k , double *a_diag , double *a , int
 				2*(_2_1 + _2_2 + _2_3 + _2_4 + _2_5 + _2_6) )* hx*hy /192;;
 				
 		return 6;
-	}else if (i==nx && j==ny || i==nx && j==ny - ny_rect || i==nx - nx_rect && j ==ny){
+    }else if ((i==nx && j==ny) || (i==nx && j==ny - ny_rect) || (i==nx - nx_rect && j ==ny)){
 		*a_diag = 1./6*hx*hy;
 		I[0] = I(i-1,j-1);   a[0] = 1./12*hx*hy; 
 		I[1] = I(i-1,j);     a[1] = 1./24*hx*hy;

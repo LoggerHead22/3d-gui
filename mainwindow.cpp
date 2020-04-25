@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "DDD.h"
 #include "approx.h"
+#include <cstdlib>
+#include <ctime>
 
 double f_1(double , double){
     return 1;
@@ -51,12 +53,40 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pLineEdit->setText(QString::number(p));
     connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::setParallelogram);
 
+    srand(time(0));
+
     computeTimer.setInterval(100);
     computeTimer.callOnTimeout(this, [&]() {
         if (allThreadsPokushali) {
             qDebug() << "spasipo, o4en' vkusno";
             freeThreadVars();
             activate();
+//            nx = 1 + rand() % 2048;
+//            ny = 1 + rand() % 2048;
+//            p = 1 + rand() % 7;
+//            l1 = 1 + rand() % 5;
+//            l2 = 1 + rand() % 5;
+//            alpha = 10 + rand() % 80;
+//            k = rand() % 90 / 100.0;
+//            LOG(nx);
+//            LOG(ny);
+//            LOG(p);
+//            LOG(l1);
+//            LOG(l2);
+//            LOG(alpha);
+//            LOG(k);
+//            LOG(currentFunctionIndex);
+//            ui->l1LineEdit->setText(QString::number(l1));
+//            ui->l2LineEdit->setText(QString::number(l2));
+//            ui->alphaLineEdit->setText(QString::number(alpha));
+//            ui->kLineEdit->setText(QString::number(k));
+//            ui->nxLineEdit->setText(QString::number(nx));
+//            ui->nyLineEdit->setText(QString::number(ny));
+//            ui->pLineEdit->setText(QString::number(p));
+//            if (rand() % 5 == 1) {
+//                ui->changeFunctionPushButton->animateClick();
+//            }
+//            compute();
         }
     });
     computeTimer.start();
