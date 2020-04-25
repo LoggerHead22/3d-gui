@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QPair>
 #include "mls.h"
+#include "triangle.h"
 using namespace std;
 
 QT_BEGIN_NAMESPACE
@@ -47,6 +48,7 @@ public:
     void deactivate();
     void redraw();
     int compute();
+    void funcRange();
 
     // поворот мышкой
     QPoint lastMousePosition;
@@ -56,6 +58,9 @@ public:
     // камера
     float zoom = 1;
     int horizontalAngle = 0, verticalAngle = 0;
+
+    // graph
+    QPair<double, double> xRange, yRange, zRange;
 
     // апроксимация
     double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
@@ -73,6 +78,8 @@ public:
     pthread_t *tids=nullptr;
     Arg *args=nullptr;
     int N;
+    vector<Triangle> func_trio;
+    double func_max, func_min;
 
     void allocThreadVars();
     void freeThreadVars();

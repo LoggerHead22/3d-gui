@@ -9,6 +9,8 @@
 #include <cstring>
 #include <pthread.h>
 #include <vector>
+#include <QVector3D>
+#include "triangle.h"
 using namespace std;
 
 extern bool allThreadsPokushali;
@@ -24,6 +26,11 @@ extern bool allThreadsPokushali;
 
 
 // static pthread_barrier_t barrier;
+
+
+int get_k(int nx , int ny , int i , int j);
+void get_ij(int nx, int ny, int nx_rect, int ny_rect,  int k, int &i , int &j);
+
 
 
 struct parral{
@@ -62,6 +69,66 @@ public:
 		return f(x + cos(alpha) / sin(alpha)* y , y);
 	}
 
+    QVector3D cord_trans(double  x, double y, double min){
+        QVector3D cor (x + cos(alpha) / sin(alpha)*y , min , y);
+        return cor;
+    }
+
+    vector<Triangle> func_trio(QVector3D eye , double (*f) (double, double), const QPair<double, double>& xRange, const QPair<double, double>& yRange, const QPair<double, double>& zRange, const QVector3D& size) {
+        const QVector3D ex = {size.x(), 0, 0};
+        const QVector3D ey = {0, size.y(), 0};
+        const QVector3D ez = {0, 0, size.z()};
+
+        const QVector3D a = -size / 2;
+        const QVector3D b = a + ez;
+        const QVector3D c = b + ex;
+        const QVector3D d = c - ez;
+        const QVector3D e = a + ey;
+
+        const double xDiff = xRange.second - xRange.first;
+        const double yDiff = yRange.second - yRange.first;
+        const double zDiff = zRange.second - zRange.first;
+
+        // переводит точку из системы координат графика в НСК
+        auto toNdc = [&](const QVector3D& p) {
+            float x = a.x() + (d.x() - a.x()) * ((p.x() - xRange.first) / xDiff);
+            float y = a.y() + (e.y() - a.y()) * ((p.y() - yRange.first) / yDiff);
+            float z = a.z() + (b.z() - a.z()) * ((p.z() - zRange.first) / zDiff);
+            return QVector3D(x, y, z);
+        };
+
+        const int x_size= 63;
+        const int y_size = 63;
+
+        double hx_ = l2_new / x_size  , hy_ = l1_new / y_size;
+        int x_rect = k*l2_new / (hx_);
+        int y_rect = k*l1_new / (hy_);
+        //qDebug() << x_rect << y_rect;
+
+        vector<Triangle> trio;
+        double cos_ = cos(alpha) , sin_ = sin(alpha);
+
+        int K = (x_size+1)*(y_size + 1) - x_rect*y_rect;
+        int i,j;
+        for( int k = 0; k < K;k++){
+            get_ij(x_size, y_size, x_rect, y_rect, k,i,j);
+            if( (i < x_size - x_rect && j < y_size) || (i >= x_size - x_rect && i < x_size && j < y_size - y_rect) ){
+                trio.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , f_par(i*hx_     , hy_*(j   )  , f)    , hy_*(j   ) )) ,
+                                        toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , f_par((i+1)*hx_ , hy_*(j+ 1)  , f)    , hy_*(j+ 1) )),
+                                        toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j   )     , f_par((i+1)*hx_ , hy_*(j   )  , f)    , hy_*(j   ) ))));
+                trio.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , f_par(i*hx_     , hy_*(j   )  , f)    , hy_*(j   ) )) ,
+                                        toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j+ 1)     , f_par(i*hx_     , hy_*(j+ 1)  , f)    , hy_*(j+ 1) )) ,
+                                        toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , f_par((i+1)*hx_ , hy_*(j+ 1)  , f)    , hy_*(j+ 1) ))));
+
+            }
+        }
+        std::sort(trio.begin(), trio.end(), [&](const Triangle& a, const Triangle& b) {
+            return (eye - a.center()).length() > (eye - b.center()).length();
+        });
+        return trio;
+
+    }
+
 	
 };
 
@@ -78,8 +145,7 @@ double residual_compute(double *x , parral &par, double (*f) (double, double) , 
 
 
 
-int get_k(int nx , int ny , int i , int j);
-void get_ij(int nx, int ny, int k, int &i , int &j);
+
 int get_num_offdiag(int nx, int ny, int nx_rect, int ny_rect,int k);
 int get_non_zeros(int nx, int ny , int nx_rect, int ny_rect);
 int get_offdiag_elem( int nx , int ny , int nx_rect, int ny_rect, int k , double *a_diag , double *a , int *I);

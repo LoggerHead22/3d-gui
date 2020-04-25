@@ -74,6 +74,16 @@ struct DDD {
         painter.drawPath(path);
     }
 
+    void fillPolygon(const QVector<QVector3D>& points, const QColor& color = Qt::black) {
+        QPainterPath path;
+        QVector<QPointF> poly;
+        for (auto& it: points) {
+            poly.push_back(project(it));
+        }
+        path.addPolygon(poly);
+        painter.fillPath(path, QBrush(color));
+    }
+
     void drawPoint(const QVector3D& a, float r) {
         painter.drawEllipse(project(a), r, r);
     }
@@ -172,7 +182,7 @@ struct DDD {
         painter.setPen(Qt::black);
     }
 
-    void drawTriangles(std::vector<Triangle> triangles) {
+    void drawTriangles(const std::vector<Triangle>& triangles) {
         for (const auto& it : triangles) {
             const QVector3D& p0 = it.p0;
             const QVector3D& p1 = it.p1;
@@ -183,7 +193,7 @@ struct DDD {
 
             float intensity = QVector3D::dotProduct(normal, light);
             intensity = qMax(0.f, intensity);
-            painter.setBrush(QColor(intensity * 255, intensity * 255, intensity * 255));
+            painter.setBrush(QColor(255, 255 - intensity * 255, 0));
             fillTriangle(p0, p1, p2);
         }
         painter.setBrush(Qt::black);

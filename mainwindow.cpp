@@ -55,54 +55,131 @@ MainWindow::MainWindow(QWidget *parent)
 
     srand(time(0));
 
+    qDebug() << 1;
+    par = parral(l1 , l2 , alpha, k , nx, ny);
+    qDebug() << 2;
+    funcRange();
+    qDebug() << 3;
+
     computeTimer.setInterval(100);
     computeTimer.callOnTimeout(this, [&]() {
         if (allThreadsPokushali) {
             qDebug() << "spasipo, o4en' vkusno";
             freeThreadVars();
             activate();
-//            nx = 1 + rand() % 2048;
-//            ny = 1 + rand() % 2048;
-//            p = 1 + rand() % 7;
-//            l1 = 1 + rand() % 5;
-//            l2 = 1 + rand() % 5;
-//            alpha = 10 + rand() % 80;
-//            k = rand() % 90 / 100.0;
-//            LOG(nx);
-//            LOG(ny);
-//            LOG(p);
-//            LOG(l1);
-//            LOG(l2);
-//            LOG(alpha);
-//            LOG(k);
-//            LOG(currentFunctionIndex);
-//            ui->l1LineEdit->setText(QString::number(l1));
-//            ui->l2LineEdit->setText(QString::number(l2));
-//            ui->alphaLineEdit->setText(QString::number(alpha));
-//            ui->kLineEdit->setText(QString::number(k));
-//            ui->nxLineEdit->setText(QString::number(nx));
-//            ui->nyLineEdit->setText(QString::number(ny));
-//            ui->pLineEdit->setText(QString::number(p));
-//            if (rand() % 5 == 1) {
-//                ui->changeFunctionPushButton->animateClick();
-//            }
-//            compute();
+
+            //            nx = 1 + rand() % 2048;
+            //            ny = 1 + rand() % 2048;
+            //            p = 1 + rand() % 7;
+            //            l1 = 1 + rand() % 5;
+            //            l2 = 1 + rand() % 5;
+            //            alpha = 10 + rand() % 80;
+            //            k = rand() % 90 / 100.0;
+            //            LOG(nx);
+            //            LOG(ny);
+            //            LOG(p);
+            //            LOG(l1);
+            //            LOG(l2);
+            //            LOG(alpha);
+            //            LOG(k);
+            //            LOG(currentFunctionIndex);
+            //            ui->l1LineEdit->setText(QString::number(l1));
+            //            ui->l2LineEdit->setText(QString::number(l2));
+            //            ui->alphaLineEdit->setText(QString::number(alpha));
+            //            ui->kLineEdit->setText(QString::number(k));
+            //            ui->nxLineEdit->setText(QString::number(nx));
+            //            ui->nyLineEdit->setText(QString::number(ny));
+            //            ui->pLineEdit->setText(QString::number(p));
+            //            if (rand() % 5 == 1) {
+            //                ui->changeFunctionPushButton->animateClick();
+            //            }
+            //            compute();
         }
     });
     computeTimer.start();
 }
 
+void MainWindow::funcRange() {
+    yRange.first = 1e9;
+    yRange.second = -1e9;
+    auto corner = par.cord_trans(par.xs[nx] , par.ys[ny], 0);
+    qDebug() << corner;
+    xRange = {0, corner.x()};
+    zRange = {0, corner.z()};
+    const double step = (xRange.second - xRange.first) / 100;
+    for (double x = xRange.first; x <= xRange.second; x += step) {
+        for (double z = zRange.first; z <= zRange.second; z += step) {
+            if (currentFunction()(x, z) > yRange.second) {
+                yRange.second = currentFunction()(x, z);
+            }
+            if (currentFunction()(x, z) < yRange.first) {
+                yRange.first = currentFunction()(x, z);
+            }
+        }
+    }
+    if (std::abs(yRange.first - yRange.second) < 1e-15) {
+        yRange.first = yRange.first - 1;
+        yRange.second = yRange.second + 1;
+    }
+    qDebug() << xRange << yRange << zRange;
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
-//    freeThreadVars();
+    //    freeThreadVars();
 }
 
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
     QPainter painter(this);
     DDD ddd(painter, *this, getEye());
 
-    ddd.drawAxes({3, 3, 3}, {0, 10}, 2, {10, 20}, 3, {20, 30}, 4);
+//    const QPair<double, double> xRange = {0, ceil(par.l2 + par.l1_new*cos(par.alpha))};
+//    const QPair<double, double> yRange = {func_min, func_max};
+//    const QPair<double, double> zRange = {0, ceil(par.l1_new)};
+    const QVector3D size = {3 , 3, 3};
+
+    const QVector3D ex = {size.x(), 0, 0};
+    const QVector3D ey = {0, size.y(), 0};
+    const QVector3D ez = {0, 0, size.z()};
+
+    const QVector3D a = -size / 2;
+    const QVector3D b = a + ez;
+    const QVector3D c = b + ex;
+    const QVector3D d = c - ez;
+    const QVector3D e = a + ey;
+
+    const double xDiff = xRange.second - xRange.first;
+    const double yDiff = yRange.second - yRange.first;
+    const double zDiff = zRange.second - zRange.first;
+
+    // переводит точку из системы координат графика в НСК
+    auto toNdc = [&](const QVector3D& p) {
+        float x = a.x() + (d.x() - a.x()) * ((p.x() - xRange.first) / xDiff);
+        float y = a.y() + (e.y() - a.y()) * ((p.y() - yRange.first) / yDiff);
+        float z = a.z() + (b.z() - a.z()) * ((p.z() - zRange.first) / zDiff);
+        return QVector3D(x, y, z);
+    };
+
+    ddd.drawAxes(size, xRange, 5, yRange, 5, zRange, 5);
+    QVector<QVector3D> parallelogram = {
+        toNdc(par.cord_trans(par.xs[0] , par.ys[0], yRange.first)),
+        toNdc(par.cord_trans(par.xs[0] , par.ys[ny], yRange.first)),
+        toNdc(par.cord_trans(par.xs[par.nx] , par.ys[ny], yRange.first)),
+        toNdc(par.cord_trans(par.xs[par.nx] , par.ys[0], yRange.first)),
+    };
+    ddd.fillPolygon(parallelogram, QColor(255, 128, 64, 64));
+    QVector<QVector3D> cut = {
+        toNdc(par.cord_trans(par.xs[par.nx - par.nx_rect] , par.ys[ny - par.ny_rect], yRange.first)),
+        toNdc(par.cord_trans(par.xs[par.nx - par.nx_rect] , par.ys[ny], yRange.first)),
+        toNdc(par.cord_trans(par.xs[par.nx] , par.ys[ny], yRange.first)),
+        toNdc(par.cord_trans(par.xs[par.nx] , par.ys[ny - par.ny_rect], yRange.first)),
+    };
+    ddd.fillPolygon(cut, QColor(64, 128, 255, 64));
+
+    painter.setPen(Qt::transparent);
+    ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size));
+    painter.setPen(Qt::black);
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
@@ -168,11 +245,14 @@ void MainWindow::setParallelogram() {
     ny = ui->nyLineEdit->text().toInt();
     p = ui->pLineEdit->text().toInt();
     compute();
+    funcRange();
 }
 
 void MainWindow::setCurrentFunction(int index) {
     currentFunctionIndex = index;
     ui->functionLabel->setText(functions[currentFunctionIndex].second);
+    funcRange();
+    redraw();
 }
 
 void MainWindow::activate() {
@@ -199,7 +279,7 @@ int MainWindow::compute() {
 }
 
 void MainWindow::allocThreadVars() {
-//    freeThreadVars();
+    //    freeThreadVars();
 
     error = new int(0);
     par = parral(l1 , l2 , alpha, k , nx, ny);
