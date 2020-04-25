@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstring>
 #include <pthread.h>
+#include <vector>
 using namespace std;
 
 extern bool allThreadsPokushali;
@@ -29,7 +30,7 @@ struct parral{
 public:
 	double l1 = 1 , l2 = 1, alpha = 45./(180./M_PI) , k = 0.2 , hx, hy;
 	int nx = 10 , ny = 10 , nx_rect = 0 , ny_rect = 0;
-	double *xs = nullptr, *ys = nullptr;
+    std::vector<double> xs, ys;
 	double l1_new , l2_new = l2;
 	parral(){};	
 	parral(double l1_ , double l2_ , double alpha_ ,  double k_ , int nx_ , int ny_){
@@ -40,8 +41,8 @@ public:
 		nx_rect =k*l2_new/hx;
 		ny_rect =k*l1_new/hy;
 		
-		xs = new double[nx + 1];
-		ys = new double[ny + 1];
+        xs.resize(nx + 1);
+        ys.resize(ny + 1);
 		compute_grid();
 		//cout<<"HH"<<hx<<" "<<hy<<endl;
 	}
@@ -60,14 +61,7 @@ public:
 	double f_par(double x, double y , double (*f)(double, double) ){
 		return f(x + cos(alpha) / sin(alpha)* y , y);
 	}
-	
-	~parral(){
-		delete[] xs;
-		delete[] ys;
-		xs = nullptr;
-		ys = nullptr;
-	};
-	
+
 	
 };
 

@@ -143,7 +143,6 @@ void MainWindow::setParallelogram() {
 void MainWindow::setCurrentFunction(int index) {
     currentFunctionIndex = index;
     ui->functionLabel->setText(functions[currentFunctionIndex].second);
-    compute();
 }
 
 void MainWindow::activate() {
@@ -212,23 +211,23 @@ void MainWindow::allocThreadVars() {
 
 void MainWindow::freeThreadVars() {
     allThreadsPokushali = false;
-//    for(int i=0;i<p;i++) {
-//        pthread_join(tids[i],0);
-//    }
-//    delete[] tids;
-//    delete[] args;
-//    delete[] x;
-//    delete[] u;
-//    delete[] v;
-//    delete[] r;
-//    delete[] buf;
-//    delete error;
-//    tids = nullptr;
-//    args = nullptr;
-//    x = nullptr;
-//    u = nullptr;
-//    v = nullptr;
-//    r = nullptr;
-//    buf = nullptr;
-//    error = nullptr;
+    for(int i=0;i<p;i++) {
+        pthread_join(tids[i],0);
+    }
+    delete[] tids;
+    delete[] args;
+    delete[] x;
+    delete[] u;
+    delete[] v;
+    delete[] r;
+    delete[] buf;
+    delete error;
+    tids = nullptr;
+    args = nullptr;
+    x = nullptr;
+    u = nullptr;
+    v = nullptr;
+    r = nullptr;
+    buf = nullptr;
+    error = nullptr;
 }
