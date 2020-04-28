@@ -2,6 +2,7 @@
 #define TRIANGLE_H
 
 #include <QVector3D>
+#include <QDebug>
 
 struct Triangle {
     QVector3D p0, p1, p2;
@@ -16,5 +17,9 @@ struct Triangle {
         return (p0 + p1 + p2) / 3;
     }
 };
+
+inline QDebug operator<<(QDebug out, const Triangle& trio) {
+    return out << "{" << trio.p0 << ", " << trio.p1 << ", " << trio.p2 << "}";
+}
 
 #endif // TRIANGLE_H

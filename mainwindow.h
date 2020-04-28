@@ -49,7 +49,8 @@ public:
     void redraw();
     int compute();
     void funcRange();
-
+    double f_aprox_value(double x , double y);
+    vector<Triangle> func_apr_trio(QVector3D eye, const QVector3D& size );
     // поворот мышкой
     QPoint lastMousePosition;
     bool isRotating = false;
@@ -63,8 +64,8 @@ public:
     QPair<double, double> xRange, yRange, zRange;
 
     // апроксимация
-    double l1 = 3, l2 = 5, alpha = 60, k = 0.2;
-    int nx = 6, ny = 8;
+    double l1 = 3, l2 = 5, alpha = 90, k = 0.2;
+    int nx = 6, ny = 6;
     int p = 1;
     QVector<QPair<double(*)(double, double), QString>> functions;
     int currentFunctionIndex = 0;
@@ -73,12 +74,12 @@ public:
     // потоки
     int *error = nullptr;
     parral par;
-    double *a=nullptr, *b=nullptr, *x=nullptr , *v=nullptr , *u=nullptr , *r=nullptr , *buf=nullptr ;
+    double *a=nullptr, *b=nullptr, *x=nullptr , *v=nullptr , *u=nullptr , *r=nullptr , *buf=nullptr ,*x_copy = nullptr;
     int * I=nullptr;
     pthread_t *tids=nullptr;
     Arg *args=nullptr;
     int N;
-    vector<Triangle> func_trio;
+    vector<Triangle> func_trio ,apr_trio;
     double func_max, func_min;
 
     void allocThreadVars();

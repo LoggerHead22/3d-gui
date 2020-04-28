@@ -28,7 +28,7 @@ extern bool allThreadsPokushali;
 // static pthread_barrier_t barrier;
 
 
-int get_k(int nx , int ny , int i , int j);
+int get_k(int nx , int ny , int nx_rect, int ny_rect, int i , int j);
 void get_ij(int nx, int ny, int nx_rect, int ny_rect,  int k, int &i , int &j);
 
 

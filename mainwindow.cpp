@@ -55,13 +55,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     srand(time(0));
 
-    qDebug() << 1;
     par = parral(l1 , l2 , alpha, k , nx, ny);
-    qDebug() << 2;
     funcRange();
-    qDebug() << 3;
+    ui->computePushButton->animateClick();
 
-    computeTimer.setInterval(100);
+    computeTimer.setInterval(300);
     computeTimer.callOnTimeout(this, [&]() {
         if (allThreadsPokushali) {
             qDebug() << "spasipo, o4en' vkusno";
@@ -96,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
             //            compute();
         }
     });
+
     computeTimer.start();
 }
 
@@ -103,7 +102,6 @@ void MainWindow::funcRange() {
     yRange.first = 1e9;
     yRange.second = -1e9;
     auto corner = par.cord_trans(par.xs[nx] , par.ys[ny], 0);
-    qDebug() << corner;
     xRange = {0, corner.x()};
     zRange = {0, corner.z()};
     const double step = (xRange.second - xRange.first) / 100;
@@ -121,7 +119,114 @@ void MainWindow::funcRange() {
         yRange.first = yRange.first - 1;
         yRange.second = yRange.second + 1;
     }
-    qDebug() << xRange << yRange << zRange;
+}
+
+
+double  MainWindow::f_aprox_value(double x , double y){
+    int i = x/par.hx;
+    int j = y/par.hy;
+    //double k1 = (x  - i*par.hx)/par.hx;
+    //double k2 = (y - j*par.hy) / par.hy;
+
+
+    double res = x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j )];
+//    if(k1 < 0.5){
+//         k2 = 1 - k2;
+//         qDebug()<<get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j) << i << j;
+//        res = k1*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1)]
+//         + k2*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j )]
+//         + (1 - k1 - k2)*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j + 1 )];
+//    }else{
+//        k1 = 1 - k1;
+//        res = k1*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i , j )]
+//         + k2*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1 )]
+//         + (1 - k1 - k2)*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j)];
+//    }
+    //if(k1 < 0.5 && k2 < 0.5){ return x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j )];}
+    //else if(k2>=0.5 && k1 < 0.5){ return x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j+1 )];}
+    //else if(k1>=0.5 && k2 < 0.5){ return x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j )];}
+    //else {return x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1 )];}
+    return res;
+}
+
+vector<Triangle> MainWindow::func_apr_trio( QVector3D eye, const QVector3D& size ) {
+    const QVector3D ex = {size.x(), 0, 0};
+    const QVector3D ey = {0, size.y(), 0};
+    const QVector3D ez = {0, 0, size.z()};
+
+    const QVector3D a = -size / 2;
+    const QVector3D b = a + ez;
+    const QVector3D c = b + ex;
+    const QVector3D d = c - ez;
+    const QVector3D e = a + ey;
+
+    const double xDiff = xRange.second - xRange.first;
+    const double yDiff = yRange.second - yRange.first;
+    const double zDiff = zRange.second - zRange.first;
+
+    // переводит точку из системы координат графика в НСК
+    auto toNdc = [&](const QVector3D& p) {
+        float x = a.x() + (d.x() - a.x()) * ((p.x() - xRange.first) / xDiff);
+        float y = a.y() + (e.y() - a.y()) * ((p.y() - yRange.first) / yDiff);
+        float z = a.z() + (b.z() - a.z()) * ((p.z() - zRange.first) / zDiff);
+        return QVector3D(x, y, z);
+    };
+    int N = 20;
+
+    int x_size = nx, y_size = ny;
+    bool flag = false;
+    if(nx > N){
+        x_size = N;
+        flag = true;
+    }
+    if(ny > N){
+         y_size = N;
+         flag = true;
+    }
+
+    double hx_ = par.l2_new / x_size  , hy_ = par.l1_new / y_size;
+    int x_rect = k*par.l2_new / (hx_);
+    int y_rect = k*par.l1_new / (hy_);
+
+
+    vector<Triangle> trio_apr;
+    double cos_ = cos(alpha / (180.0 / M_PI)) , sin_ = sin(alpha / (180.0 / M_PI));
+
+    int K = (x_size+1)*(y_size + 1) - x_rect*y_rect;
+
+    int i,j;
+
+    double val1 = 0 ;
+    double val2 = 0 ;
+    double val3 = 0 ;
+    double val4 = 0 ;
+
+    for( int k = 0; k < K;k++){
+        get_ij(x_size, y_size, x_rect, y_rect, k,i,j);
+
+        if( (i < x_size - x_rect && j < y_size) || (i >= x_size - x_rect && i < x_size && j < y_size - y_rect) ){
+            if(flag){
+                qDebug()<<i<<j;
+                 val1 = f_aprox_value(i*hx_     , hy_*(j   ));
+                 val2 = f_aprox_value((i+1)*hx_ , hy_*(j+ 1));
+                 val3 = f_aprox_value((i+1)*hx_ , hy_*(j   ));
+                 val4 = f_aprox_value(i*hx_     , hy_*(j+ 1));
+            }
+
+            trio_apr.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , (flag ? val1 :x_copy[get_k(nx,ny,par.nx_rect,par.ny_rect ,i     , j        )])     , hy_*(j   ) )) ,
+                                        toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , (flag ? val2 :x_copy[get_k(nx,ny,par.nx_rect ,par.ny_rect,i + 1 , j+ 1 )])    , hy_*(j+ 1) )),
+                                        toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j   )     , (flag ? val3 :x_copy[get_k(nx,ny,par.nx_rect,par.ny_rect ,i + 1 , j     )])     , hy_*(j   ) ))));
+            trio_apr.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , (flag ? val1 :x_copy[get_k(nx,ny,par.nx_rect,par.ny_rect ,i     , j        )])     , hy_*(j   ) )) ,
+                                        toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j+ 1)     , (flag ? val4 :x_copy[get_k(nx,ny,par.nx_rect,par.ny_rect ,i     , j + 1    )])     , hy_*(j+ 1) )) ,
+                                        toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , (flag ? val2 :x_copy[get_k(nx,ny,par.nx_rect ,par.ny_rect,i + 1 , j+1   )])    , hy_*(j+ 1) ))));
+//            qDebug() << trio_apr[trio_apr.size() - 1] << trio_apr[trio_apr.size() - 2];
+        }
+    }
+    std::sort(trio_apr.begin(), trio_apr.end(), [&](const Triangle& a, const Triangle& b) {
+        return (eye - a.center()).length() > (eye - b.center()).length();
+    });
+    return trio_apr;
+
 }
 
 MainWindow::~MainWindow()
@@ -179,6 +284,7 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
 
     painter.setPen(Qt::transparent);
     ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size));
+    if (x_copy) ddd.drawTriangles(func_apr_trio(getEye(), size));
     painter.setPen(Qt::black);
 }
 
@@ -252,6 +358,7 @@ void MainWindow::setCurrentFunction(int index) {
     currentFunctionIndex = index;
     ui->functionLabel->setText(functions[currentFunctionIndex].second);
     funcRange();
+    compute();
     redraw();
 }
 
@@ -273,7 +380,6 @@ int MainWindow::compute() {
     deactivate();
     allocThreadVars();
     approx(p, tids, args);
-
     redraw();
     return 0;
 }
@@ -324,6 +430,8 @@ void MainWindow::freeThreadVars() {
     for(int i=0;i<p;i++) {
         pthread_join(tids[i],0);
     }
+    swap(x , x_copy);
+    redraw();
     delete[] tids;
     delete[] args;
     delete[] x;
@@ -332,6 +440,7 @@ void MainWindow::freeThreadVars() {
     delete[] r;
     delete[] buf;
     delete error;
+
     tids = nullptr;
     args = nullptr;
     x = nullptr;
