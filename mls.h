@@ -53,6 +53,33 @@ public:
 		compute_grid();
 		//cout<<"HH"<<hx<<" "<<hy<<endl;
 	}
+
+
+    void new_par(bool flag , int bs_x , int ){
+        if(flag){
+            nx*=2;
+            ny*=2;
+            nx_rect*=2;
+            ny_rect*=2;
+            hx/=2;
+            hy/=2;
+            xs.resize(nx + 1);
+            ys.resize(ny + 1);
+            compute_grid();
+        }else if(bs_x<nx){
+            nx/=2;
+            ny/=2;
+            nx_rect/=2;
+            ny_rect/=2;
+            hx*=2;
+            hy*=2;
+            xs.resize(nx + 1);
+            ys.resize(ny + 1);
+            compute_grid();
+        }
+    }
+
+
 	
 	void compute_grid(){
 		for(int i = 0 ; i<=nx; i++){
@@ -74,7 +101,8 @@ public:
         return cor;
     }
 
-    vector<Triangle> func_trio(QVector3D eye , double (*f) (double, double), const QPair<double, double>& xRange, const QPair<double, double>& yRange, const QPair<double, double>& zRange, const QVector3D& size) {
+    vector<Triangle> func_trio(QVector3D eye , double (*f) (double, double), const QPair<double, double>& xRange, const QPair<double, double>& yRange,
+                               const QPair<double, double>& zRange, const QVector3D& size , int bs_x, int bs_y , int bs_xr , int bs_yr) {
         const QVector3D ex = {size.x(), 0, 0};
         const QVector3D ey = {0, size.y(), 0};
         const QVector3D ez = {0, 0, size.z()};
@@ -97,12 +125,13 @@ public:
             return QVector3D(x, y, z);
         };
 
-        const int x_size= 63;
-        const int y_size = 63;
-
+        int L = 60;
+        const int x_size= bs_x*pow(2,int(log2(L/bs_x) + 1));
+        const int y_size =bs_y*pow(2,int(log2(L/bs_y)) + 1);
+       // qDebug()<<x_size<<y_size;
         double hx_ = l2_new / x_size  , hy_ = l1_new / y_size;
-        int x_rect = k*l2_new / (hx_);
-        int y_rect = k*l1_new / (hy_);
+        int x_rect = bs_xr*pow(2,int(log2(L/bs_x)) + 1);
+        int y_rect = bs_yr*pow(2,int(log2(L/bs_y)) + 1);
         //qDebug() << x_rect << y_rect;
 
         vector<Triangle> trio;

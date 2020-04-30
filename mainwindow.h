@@ -27,7 +27,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(int bs_x , int bs_y ,  QWidget *parent = nullptr);
     ~MainWindow();
 
     void paintEvent(QPaintEvent* event) override;
@@ -50,7 +50,7 @@ public:
     int compute();
     void funcRange();
     double f_aprox_value(double x , double y);
-    vector<Triangle> func_apr_trio(QVector3D eye, const QVector3D& size );
+    vector<Triangle> func_apr_trio( const QVector3D& size );
     // поворот мышкой
     QPoint lastMousePosition;
     bool isRotating = false;
@@ -66,6 +66,10 @@ public:
     // апроксимация
     double l1 = 3, l2 = 5, alpha = 90, k = 0.2;
     int nx = 6, ny = 6;
+    const int base_nx , base_ny;
+    parral par;
+    const int base_nx_rect , base_ny_rect;
+
     int p = 1;
     QVector<QPair<double(*)(double, double), QString>> functions;
     int currentFunctionIndex = 0;
@@ -73,7 +77,7 @@ public:
 
     // потоки
     int *error = nullptr;
-    parral par;
+
     double *a=nullptr, *b=nullptr, *x=nullptr , *v=nullptr , *u=nullptr , *r=nullptr , *buf=nullptr ,*x_copy = nullptr;
     int * I=nullptr;
     pthread_t *tids=nullptr;
