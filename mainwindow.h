@@ -51,6 +51,7 @@ public:
     void funcRange();
     double f_aprox_value(double x , double y);
     vector<Triangle> func_apr_trio( const QVector3D& size );
+    vector<Triangle> func_resid_trio(const QVector3D& size );
     // поворот мышкой
     QPoint lastMousePosition;
     bool isRotating = false;
@@ -83,7 +84,7 @@ public:
     pthread_t *tids=nullptr;
     Arg *args=nullptr;
     int N;
-    vector<Triangle> func_trio ,apr_trio;
+    vector<Triangle> func_trio ,apr_trio , resid_trio;
     double func_max, func_min;
 
     void allocThreadVars();
