@@ -79,7 +79,7 @@ MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
     ui->pLineEdit->setText(QString::number(p));
     connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::setParallelogram);
 
-    srand(time(0));
+    //srand(time(0));
 
 
     funcRange();
@@ -155,13 +155,13 @@ double  MainWindow::f_aprox_value(double x , double y){
     double k2 = (y - j*par.hy) / par.hy;
     double res = 0;
 
-    //double res = x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j )];
-    if(i>=nx - par.nx_rect && j>=ny - par.ny_rect){
-        i = nx - par.nx_rect - 1;
-        j = ny - par.ny_rect - 1;
+    if(i==nx || (i==nx - par.nx_rect && j >= ny - par.ny_rect)){
+        i--;
+        k1 = 1;
     }
-    if(i>=nx - par.nx_rect && j>=ny - par.ny_rect){
-
+    if(j==ny || (i>=nx - par.nx_rect && j == ny - par.ny_rect)){
+        j--;
+        k2 = 1;
     }
     if(k2 - k1 > 0){
          k2 = 1 - k2;
@@ -207,9 +207,9 @@ vector<Triangle> MainWindow::func_resid_trio(const QVector3D& size ) {
     const int y_size =base_ny*pow(2,int(log2(L/base_ny)) + 1);
    // qDebug()<<x_size<<y_size;
     double hx_ = par.l2_new / x_size  , hy_ = par.l1_new / y_size;
-    int x_rect = base_nx_rect*pow(2,int(log2(L/base_nx_rect)) + 1);
-    int y_rect = base_ny_rect*pow(2,int(log2(L/base_ny_rect)) + 1);
-    //qDebug() << x_rect << y_rect;
+    int x_rect = base_nx_rect*pow(2,int(log2(L/base_nx)) + 1);
+    int y_rect = base_ny_rect*pow(2,int(log2(L/base_ny)) + 1);
+    qDebug() <<x_size<<y_size<< x_rect << y_rect;
 
     vector<Triangle> resid_trio;
     double cos_ = cos(alpha / (180.0 / M_PI)) , sin_ = sin(alpha / (180.0 / M_PI));
@@ -219,12 +219,12 @@ vector<Triangle> MainWindow::func_resid_trio(const QVector3D& size ) {
     for( int k = 0; k < K;k++){
         get_ij(x_size, y_size, x_rect, y_rect, k,i,j);
         if( (i < x_size - x_rect && j < y_size) || (i >= x_size - x_rect && i < x_size && j < y_size - y_rect) ){
-            resid_trio.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , par.f_par(i*hx_     , hy_*(j   ), currentFunction())  - f_aprox_value(i*hx_     , hy_*(j   ))    , hy_*(j   ) )) ,
-                                          toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , par.f_par((i+1)*hx_ , hy_*(j+ 1), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j+ 1))    , hy_*(j+ 1) )),
-                                          toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j   )     , par.f_par((i+1)*hx_ , hy_*(j   ), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j   ))    , hy_*(j   ) ))));
-            resid_trio.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , par.f_par(i*hx_     , hy_*(j   ), currentFunction())  - f_aprox_value(i*hx_     , hy_*(j   ))    , hy_*(j   ) )) ,
-                                          toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j+ 1)     , par.f_par(i*hx_     , hy_*(j+ 1), currentFunction())  - f_aprox_value(i*hx_     , hy_*(j+ 1))    , hy_*(j+ 1) )) ,
-                                          toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , par.f_par((i+1)*hx_ , hy_*(j+ 1), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j+ 1))    , hy_*(j+ 1) ))));
+            resid_trio.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , abs(par.f_par(i*hx_     , hy_*(j   ), currentFunction())  - f_aprox_value(i*hx_     , hy_*(j   )))    , hy_*(j   ) )) ,
+                                          toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , abs(par.f_par((i+1)*hx_ , hy_*(j+ 1), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j+ 1)))    , hy_*(j+ 1) )),
+                                          toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j   )     , abs(par.f_par((i+1)*hx_ , hy_*(j   ), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j   )))    , hy_*(j   ) ))));
+            resid_trio.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , abs(par.f_par(i*hx_     , hy_*(j   ), currentFunction())  - f_aprox_value(i*hx_     , hy_*(j   )))    , hy_*(j   ) )) ,
+                                          toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j+ 1)     , abs(par.f_par(i*hx_     , hy_*(j+ 1), currentFunction())  - f_aprox_value(i*hx_     , hy_*(j+ 1)))    , hy_*(j+ 1) )) ,
+                                          toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , abs(par.f_par((i+1)*hx_ , hy_*(j+ 1), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j+ 1)))    , hy_*(j+ 1) ))));
 
         }
     }
@@ -321,7 +321,8 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
     QPainter painter(this);
     DDD ddd(painter, *this, getEye());
-
+    yRange.first = 0;
+    yRange.second = 61;
 //    const QPair<double, double> xRange = {0, ceil(par.l2 + par.l1_new*cos(par.alpha))};
 //    const QPair<double, double> yRange = {func_min, func_max};
 //    const QPair<double, double> zRange = {0, ceil(par.l1_new)};
@@ -366,19 +367,19 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     ddd.fillPolygon(cut, QColor(64, 128, 255, 64));
 
     painter.setPen(Qt::transparent);
-   // ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect));
+    ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect));
     auto eye = getEye();
     if (x_copy){
 
-//        std::sort(apr_trio.begin(), apr_trio.end(), [&](const Triangle& a, const Triangle& b) {
+        std::sort(apr_trio.begin(), apr_trio.end(), [&](const Triangle& a, const Triangle& b) {
+            return (eye - a.center()).length() > (eye - b.center()).length();
+        });
+        ddd.drawTriangles(apr_trio);
+
+//        std::sort(resid_trio.begin(), resid_trio.end(), [&](const Triangle& a, const Triangle& b) {
 //            return (eye - a.center()).length() > (eye - b.center()).length();
 //        });
-//        ddd.drawTriangles(apr_trio);
-
-                std::sort(resid_trio.begin(), resid_trio.end(), [&](const Triangle& a, const Triangle& b) {
-                    return (eye - a.center()).length() > (eye - b.center()).length();
-                });
-                ddd.drawTriangles(resid_trio);
+//        ddd.drawTriangles(resid_trio);
 
     }
     painter.setPen(Qt::black);
@@ -518,6 +519,8 @@ void MainWindow::allocThreadVars() {
         args[i].ny = par.ny;
         args[i].f = currentFunction();
         args[i].par = &par;
+        args[i].resid = &residual;
+        args[i].fulltime = &time;
     }
 }
 
@@ -526,6 +529,10 @@ void MainWindow::freeThreadVars() {
     for(int i=0;i<p;i++) {
         pthread_join(tids[i],0);
     }
+    residual = *args[0].resid;
+    ui->resid_label->setText("Residual: " + QString::number(residual));
+    time = *args[0].fulltime;
+    ui->time_label->setText("Time: " + QString::number(time));
     swap(x , x_copy);
     apr_trio = func_apr_trio({3,3,3});
     resid_trio = func_resid_trio({3,3,3});

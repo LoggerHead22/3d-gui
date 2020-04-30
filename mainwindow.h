@@ -70,6 +70,7 @@ public:
     const int base_nx , base_ny;
     parral par;
     const int base_nx_rect , base_ny_rect;
+    double residual , time;
 
     int p = 1;
     QVector<QPair<double(*)(double, double), QString>> functions;

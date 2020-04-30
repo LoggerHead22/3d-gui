@@ -11,6 +11,7 @@
 #include <vector>
 #include <QVector3D>
 #include "triangle.h"
+#include <ctime>
 using namespace std;
 
 extern bool allThreadsPokushali;
@@ -198,7 +199,7 @@ void print_MSR_matrix(double * A , int * I, int N );
 
 struct Arg{
         int nx, ny ,m, p, thr_ind ,*error , **I;
-        double **A,**b , *x, *u , *v , *buf , *r , time_thr, fulltime, n_err , *xs , *ys;
+        double **A,**b , *x, *u , *v , *buf , *r , time_thr, *fulltime, n_err , *xs , *ys , *resid;
 		double hx , hy;
 		double (*f)(double,double);
 		parral* par;

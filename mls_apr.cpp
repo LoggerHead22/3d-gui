@@ -430,8 +430,12 @@ void* msl_approx(void *in_arg) {
     double *&A = *arg.A , *&b = *arg.b;
     int* err = arg.error , *&I = *arg.I;
 	double *x = arg.x, *u = arg.u , *v = arg.v , *r = arg.r , *buf = arg.buf;
+    double time;
+
+
 
 	if(thr_ind == 0) {
+         time = clock();
 		//cout<<"Im in "<<endl;
 		if(allocate_MSR_matrix(nx, ny,nx_rect , ny_rect, A, I)!= 0){
 			//cout << thr_ind << ": " << I << "\n";
@@ -498,6 +502,7 @@ void* msl_approx(void *in_arg) {
 	
 	
 	if(thr_ind == 0){
+        time  = clock() - time;
 		if(iter_count > 0){
 			cout<<endl<<"Vector x: "<<endl;
 			print_vector(x , N); 
@@ -517,6 +522,8 @@ void* msl_approx(void *in_arg) {
 	
 	if(thr_ind == 0){
 		cout<<"RESIDUAL : "<<resid<<endl;
+        *arg.resid = resid;
+        *arg.fulltime  = time / CLOCKS_PER_SEC;
 	}
 
     reduce_sum(p);

@@ -19,8 +19,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>641</width>
-      <height>102</height>
+      <width>731</width>
+      <height>118</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -53,15 +53,15 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="alphaLineEdit"/>
-       </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
           <string>k</string>
          </property>
         </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="alphaLineEdit"/>
        </item>
        <item row="3" column="1">
         <widget class="QLineEdit" name="kLineEdit"/>
@@ -121,25 +121,59 @@
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="functionLabel">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QPushButton" name="computePushButton">
+         <property name="text">
+          <string>Compute</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="changeFunctionPushButton">
+         <property name="text">
+          <string>Change function</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="changeFunctionPushButton">
-       <property name="text">
-        <string>Change function</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="computePushButton">
-       <property name="text">
-        <string>Compute</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="functionLabel">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="time_label">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="resid_label">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>
