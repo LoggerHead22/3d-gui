@@ -14,6 +14,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QPair>
+#include <QKeyEvent>
 #include "mls.h"
 #include "triangle.h"
 using namespace std;
@@ -35,6 +36,7 @@ public:
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
+    void keyReleaseEvent(QKeyEvent* event) override;
 
     QVector3D getEye();
     using XXX = double(*)(double, double);
@@ -49,6 +51,7 @@ public:
     void redraw();
     int compute();
     void funcRange();
+    void changeKit();
     double f_aprox_value(double x , double y);
     vector<Triangle> func_apr_trio( const QVector3D& size );
     vector<Triangle> func_resid_trio(const QVector3D& size );
@@ -71,6 +74,7 @@ public:
     parral par;
     const int base_nx_rect , base_ny_rect;
     double residual , time;
+    int kit = 0;
 
     int p = 1;
     QVector<QPair<double(*)(double, double), QString>> functions;

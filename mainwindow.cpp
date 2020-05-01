@@ -81,6 +81,7 @@ MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
     connect(ui->computePushButton, &QPushButton::released, this, &MainWindow::setParallelogram);
 
     //srand(time(0));
+    ui->kitLabel->setText("Набор: функция");
 
 
     funcRange();
@@ -123,6 +124,24 @@ MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
     });
 
     computeTimer.start();
+}
+
+void MainWindow::changeKit() {
+    kit = (kit + 1) % 4;
+    if (kit == 0) {
+        ui->kitLabel->setText("Набор: функция");
+    }
+    if (kit == 1) {
+        ui->kitLabel->setText("Набор: апроксимация");
+    }
+    if (kit == 2) {
+        ui->kitLabel->setText("Набор: функция + апроксимация");
+    }
+    if (kit == 3) {
+        ui->kitLabel->setText("Набор: невязка");
+    }
+    funcRange();
+    redraw();
 }
 
 void MainWindow::funcRange() {
@@ -322,11 +341,10 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
     QPainter painter(this);
     DDD ddd(painter, *this, getEye());
-    yRange.first = 0;
-    yRange.second = 61;
-//    const QPair<double, double> xRange = {0, ceil(par.l2 + par.l1_new*cos(par.alpha))};
-//    const QPair<double, double> yRange = {func_min, func_max};
-//    const QPair<double, double> zRange = {0, ceil(par.l1_new)};
+    if (kit == 3) {
+        yRange.first = 0;
+        yRange.second = qMax(1e-10, residual * 2);
+    }
     const QVector3D size = {3 , 3, 3};
 
     const QVector3D ex = {size.x(), 0, 0};
@@ -368,22 +386,33 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     ddd.fillPolygon(cut, QColor(64, 128, 255, 64));
 
     painter.setPen(Qt::transparent);
-    ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect));
+    if (kit == 0 || kit == 2) {
+        ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect));
+    }
     auto eye = getEye();
     if (x_copy){
 
-        std::sort(apr_trio.begin(), apr_trio.end(), [&](const Triangle& a, const Triangle& b) {
-            return (eye - a.center()).length() > (eye - b.center()).length();
-        });
-        ddd.drawTriangles(apr_trio);
+        if (kit == 1 || kit == 2) {
+            std::sort(apr_trio.begin(), apr_trio.end(), [&](const Triangle& a, const Triangle& b) {
+                return (eye - a.center()).length() > (eye - b.center()).length();
+            });
+            ddd.drawTriangles(apr_trio);
+        }
 
-//        std::sort(resid_trio.begin(), resid_trio.end(), [&](const Triangle& a, const Triangle& b) {
-//            return (eye - a.center()).length() > (eye - b.center()).length();
-//        });
-//        ddd.drawTriangles(resid_trio);
-
+        if (kit == 3) {
+            std::sort(resid_trio.begin(), resid_trio.end(), [&](const Triangle& a, const Triangle& b) {
+                return (eye - a.center()).length() > (eye - b.center()).length();
+            });
+            ddd.drawTriangles(resid_trio);
+        }
     }
     painter.setPen(Qt::black);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_1) {
+        changeKit();
+    }
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
