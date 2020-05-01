@@ -26,10 +26,6 @@ double f_6(double x, double y){
     return exp(x)*exp(y);
 }
 
-double f_7(double x, double y){
-    return x*y*(10 - x - y);
-}
-
 MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
     :  QMainWindow(parent), base_nx(bs_x) , base_ny(bs_y),par(l1 , l2 , alpha, k , base_nx, base_ny),base_nx_rect(par.nx_rect) ,base_ny_rect(par.ny_rect) ,
    ui(new Ui::MainWindow)
@@ -46,7 +42,6 @@ MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
     functions.push_back({f_4, "f(x, y) = x + y"});
     functions.push_back({f_5, "f(x, y) = x*y + x*x"});
     functions.push_back({f_6, "f(x, y) = e^x * e^y"});
-    functions.push_back({f_7, "f(x, y) = x*y*(10 - x - y)"});
 
 
     ui->functionLabel->setText(functions[0].second);
@@ -342,9 +337,10 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent* /* event */) {
     QPainter painter(this);
     DDD ddd(painter, *this, getEye());
+    auto temp = yRange;
     if (kit == 3) {
         yRange.first = 0;
-        yRange.second = qMax(1e-10, residual * 2);
+        yRange.second = qMax(1e-15, residual * 2);
     }
     const QVector3D size = {3 , 3, 3};
 
@@ -389,7 +385,7 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     painter.setPen(Qt::transparent);
     auto eye = getEye();
     if (kit == 0 || kit == 2) {
-        ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect), QColor(255, 128, 0), QColor(255, 0, 0));
+        ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect), QColor(64, 32, 128), QColor(128, 0, 0));
     }
     if (x_copy){
 
@@ -404,10 +400,11 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
             std::sort(resid_trio.begin(), resid_trio.end(), [&](const Triangle& a, const Triangle& b) {
                 return (eye - a.center()).length() > (eye - b.center()).length();
             });
-            ddd.drawTriangles(resid_trio, QColor(0, 0, 0), QColor(255, 255, 255));
+            ddd.drawTriangles(resid_trio, QColor(255, 0, 0), QColor(255, 255, 0));
         }
     }
     painter.setPen(Qt::black);
+    yRange = temp;
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event) {
@@ -493,8 +490,8 @@ void MainWindow::setParallelogram() {
     nx = ui->nxLineEdit->text().toInt();
     ny = ui->nyLineEdit->text().toInt();
     p = ui->pLineEdit->text().toInt();
-    compute();
     funcRange();
+    compute();
 }
 
 void MainWindow::setCurrentFunction(int index) {
@@ -508,11 +505,15 @@ void MainWindow::setCurrentFunction(int index) {
 void MainWindow::activate() {
     ui->computePushButton->setEnabled(true);
     ui->changeFunctionPushButton->setEnabled(true);
+    ui->nmlt2_pb->setEnabled(true);
+    ui->ndiv2_pb->setEnabled(true);
 }
 
 void MainWindow::deactivate() {
     ui->computePushButton->setEnabled(false);
     ui->changeFunctionPushButton->setEnabled(false);
+    ui->nmlt2_pb->setEnabled(false);
+    ui->ndiv2_pb->setEnabled(false);
 }
 
 void MainWindow::redraw() {
@@ -524,6 +525,7 @@ int MainWindow::compute() {
     deactivate();
     allocThreadVars();
     approx(p, tids, args);
+    funcRange();
     redraw();
     return 0;
 }
@@ -582,7 +584,12 @@ void MainWindow::freeThreadVars() {
     ui->time_label->setText("Time: " + QString::number(time));
     swap(x , x_copy);
     apr_trio = func_apr_trio({3,3,3});
+    auto temp = yRange;
+    yRange.first = 0;
+    yRange.second = max(1e-15, residual);
     resid_trio = func_resid_trio({3,3,3});
+    yRange = temp;
+    funcRange();
     redraw();
     delete[] tids;
     delete[] args;
