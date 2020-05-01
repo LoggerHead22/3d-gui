@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
 //    MainWindow w(nx, ny, p, l1, l2, alpha, k);
 
-    MainWindow w(6, 7, 3, 3, 5, 60, 0.4);
+    MainWindow w(3, 4, 3, 3, 5, 60, 0.4);
     w.show();
     return a.exec();
 }

@@ -26,6 +26,15 @@ double f_6(double x, double y){
     return exp(x + y);
 }
 
+double f_7(double x, double y){
+    return x*x - y;
+}
+
+double f_8(double x, double y){
+    return x*y*(10 - x - y);
+}
+
+
 MainWindow::MainWindow(int bs_x , int bs_y , int p, double l1, double l2, double alpha, double k,QWidget *parent)
     :  QMainWindow(parent), base_nx(bs_x) , base_ny(bs_y), p(p), l1(l1), l2(l2), alpha(alpha), k(k), par(l1 , l2 , alpha, k , base_nx, base_ny),base_nx_rect(par.nx_rect) ,base_ny_rect(par.ny_rect) ,
    ui(new Ui::MainWindow)
@@ -42,7 +51,8 @@ MainWindow::MainWindow(int bs_x , int bs_y , int p, double l1, double l2, double
     functions.push_back({f_4, "f(x, y) = x + y"});
     functions.push_back({f_5, "f(x, y) = x*y + x*x"});
     functions.push_back({f_6, "f(x, y) = e^(x + y)"});
-
+    functions.push_back({f_7, "f(x, y) = x*x - y"});
+    functions.push_back({f_8, "f(x, y) = x*y*(10 - x - y)"});
 
     ui->functionLabel->setText(functions[0].second);
     connect(ui->changeFunctionPushButton, &QPushButton::released, this, [&]() {
@@ -170,16 +180,26 @@ double  MainWindow::f_aprox_value(double x , double y){
     double k1 = (x  - i*par.hx)/par.hx;
     double k2 = (y - j*par.hy) / par.hy;
     double res = 0;
+    bool flag = false;
 
-    if(i==nx || (i==nx - par.nx_rect && j >= ny - par.ny_rect)){
-        i--;
-        k1 = 1;
+    if(i == base_nx - base_nx_rect && j == base_ny - base_ny_rect){
+        flag = true;
+        qDebug()<<"X,Y: "<<x<<y<<"K: "<<k1<<k2;
     }
-    if(j==ny || (i>=nx - par.nx_rect && j == ny - par.ny_rect)){
-        j--;
-        k2 = 1;
-    }
-    if(k2 - k1 > 0){
+//    int temp_i = i;
+//    if(i==nx || (i==nx - par.nx_rect && j >= ny - par.ny_rect)){
+//        i--;
+//        k1 = 1;
+//    }
+//    if(j==ny || (temp_i>=nx - par.nx_rect && j == ny - par.ny_rect)){
+//        j--;
+//        k2 = 1;
+//    }
+    if(k1 < 1e-14 && k2 < 1e-14){
+        res = x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j)];
+    }else if(abs(k1 -1) < 1e-14 && abs(k2 - 1) < 1e-14){
+        res = x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1)];
+    }else if(k2 - k1 > 0){
          k2 = 1 - k2;
         // qDebug()<<get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j) << i << j;
         res = k1*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1)]
@@ -191,7 +211,10 @@ double  MainWindow::f_aprox_value(double x , double y){
          + k2*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1 )]
          + (1 - k1 - k2)*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j)];
     }
+    if(flag){
+        qDebug()<<"ANGLE : "<<res;
 
+    }
     return res;
 }
 
@@ -218,7 +241,7 @@ vector<Triangle> MainWindow::func_resid_trio(const QVector3D& size ) {
         return QVector3D(x, y, z);
     };
 
-    int L = 12;
+    int L = 5;
     const int x_size= base_nx*pow(2,int(log2(L/base_nx) + 1));
     const int y_size =base_ny*pow(2,int(log2(L/base_ny)) + 1);
    // qDebug()<<x_size<<y_size;
@@ -235,6 +258,7 @@ vector<Triangle> MainWindow::func_resid_trio(const QVector3D& size ) {
     for( int k = 0; k < K;k++){
         get_ij(x_size, y_size, x_rect, y_rect, k,i,j);
         if( (i < x_size - x_rect && j < y_size) || (i >= x_size - x_rect && i < x_size && j < y_size - y_rect) ){
+            qDebug()<<"Grid of resid: "<<i<<j;
             resid_trio.push_back(Triangle(toNdc(QVector3D(i*hx_      + cos_/sin_* hy_*(j   )     , abs(par.f_par(i*hx_     , hy_*(j   ), currentFunction())  - f_aprox_value(i*hx_     , hy_*(j   )))    , hy_*(j   ) )) ,
                                           toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j+ 1)     , abs(par.f_par((i+1)*hx_ , hy_*(j+ 1), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j+ 1)))    , hy_*(j+ 1) )),
                                           toNdc(QVector3D((i+1)*hx_  + cos_/sin_* hy_*(j   )     , abs(par.f_par((i+1)*hx_ , hy_*(j   ), currentFunction())  - f_aprox_value((i+1)*hx_ , hy_*(j   )))    , hy_*(j   ) ))));
@@ -385,7 +409,13 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     painter.setPen(Qt::transparent);
     auto eye = getEye();
     if (kit == 0 || kit == 2) {
-        ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect), QColor(64, 32, 128), QColor(128, 0, 0));
+        qDebug()<<func_trio.size();
+
+//        std::sort(func_trio.begin(), func_trio.end(), [&](const Triangle& a, const Triangle& b) {
+//            return (eye - a.center()).length() > (eye - b.center()).length();
+//        });
+
+        ddd.drawTriangles(func_trio, QColor(64, 32, 128), QColor(128, 0, 0));
     }
     if (x_copy){
 
@@ -578,13 +608,16 @@ void MainWindow::freeThreadVars() {
     for(int i=0;i<p;i++) {
         pthread_join(tids[i],0);
     }
+    auto temp = yRange;
+    qDebug()<<577777;
     residual = *args[0].resid;
     ui->resid_label->setText("Residual: " + QString::number(residual));
     time = *args[0].fulltime;
     ui->time_label->setText("Time: " + QString::number(time));
     swap(x , x_copy);
+    func_trio = par.func_trio(currentFunction(), xRange, yRange, zRange, {3,3,3} , base_nx, base_ny , base_nx_rect , base_ny_rect);
+
     apr_trio = func_apr_trio({3,3,3});
-    auto temp = yRange;
     yRange.first = 0;
     yRange.second = max(1e-15, 2*residual);
     resid_trio = func_resid_trio({3,3,3});

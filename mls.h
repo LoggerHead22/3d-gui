@@ -102,7 +102,7 @@ public:
         return cor;
     }
 
-    vector<Triangle> func_trio(QVector3D eye , double (*f) (double, double), const QPair<double, double>& xRange, const QPair<double, double>& yRange,
+    vector<Triangle> func_trio( double (*f) (double, double), const QPair<double, double>& xRange, const QPair<double, double>& yRange,
                                const QPair<double, double>& zRange, const QVector3D& size , int bs_x, int bs_y , int bs_xr , int bs_yr) {
         const QVector3D ex = {size.x(), 0, 0};
         const QVector3D ey = {0, size.y(), 0};
@@ -139,6 +139,7 @@ public:
         double cos_ = cos(alpha) , sin_ = sin(alpha);
 
         int K = (x_size+1)*(y_size + 1) - x_rect*y_rect;
+        //qDebug()<<"FFFFFFFFFFFFFFFFFFFFF"<<x_size<<y_size<<x_rect<<y_rect<<K;
         int i,j;
         for( int k = 0; k < K;k++){
             get_ij(x_size, y_size, x_rect, y_rect, k,i,j);
@@ -152,9 +153,7 @@ public:
 
             }
         }
-        std::sort(trio.begin(), trio.end(), [&](const Triangle& a, const Triangle& b) {
-            return (eye - a.center()).length() > (eye - b.center()).length();
-        });
+
         return trio;
 
     }
