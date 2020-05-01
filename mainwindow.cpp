@@ -23,11 +23,11 @@ double f_5(double x, double y){
 }
 
 double f_6(double x, double y){
-    return exp(x)*exp(y);
+    return exp(x + y);
 }
 
-MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
-    :  QMainWindow(parent), base_nx(bs_x) , base_ny(bs_y),par(l1 , l2 , alpha, k , base_nx, base_ny),base_nx_rect(par.nx_rect) ,base_ny_rect(par.ny_rect) ,
+MainWindow::MainWindow(int bs_x , int bs_y , int p, double l1, double l2, double alpha, double k,QWidget *parent)
+    :  QMainWindow(parent), base_nx(bs_x) , base_ny(bs_y), p(p), l1(l1), l2(l2), alpha(alpha), k(k), par(l1 , l2 , alpha, k , base_nx, base_ny),base_nx_rect(par.nx_rect) ,base_ny_rect(par.ny_rect) ,
    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -41,7 +41,7 @@ MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
     functions.push_back({f_3, "f(x, y) = y"});
     functions.push_back({f_4, "f(x, y) = x + y"});
     functions.push_back({f_5, "f(x, y) = x*y + x*x"});
-    functions.push_back({f_6, "f(x, y) = e^x * e^y"});
+    functions.push_back({f_6, "f(x, y) = e^(x + y)"});
 
 
     ui->functionLabel->setText(functions[0].second);
@@ -218,7 +218,7 @@ vector<Triangle> MainWindow::func_resid_trio(const QVector3D& size ) {
         return QVector3D(x, y, z);
     };
 
-    int L = 60;
+    int L = 12;
     const int x_size= base_nx*pow(2,int(log2(L/base_nx) + 1));
     const int y_size =base_ny*pow(2,int(log2(L/base_ny)) + 1);
    // qDebug()<<x_size<<y_size;
@@ -586,7 +586,7 @@ void MainWindow::freeThreadVars() {
     apr_trio = func_apr_trio({3,3,3});
     auto temp = yRange;
     yRange.first = 0;
-    yRange.second = max(1e-15, residual);
+    yRange.second = max(1e-15, 2*residual);
     resid_trio = func_resid_trio({3,3,3});
     yRange = temp;
     funcRange();

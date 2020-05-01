@@ -28,7 +28,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(int bs_x , int bs_y ,  QWidget *parent = nullptr);
+    MainWindow(int bs_x , int bs_y , int p, double l1, double l2, double alpha, double k, QWidget *parent = nullptr);
     ~MainWindow();
 
     void paintEvent(QPaintEvent* event) override;
@@ -68,16 +68,18 @@ public:
     QPair<double, double> xRange, yRange, zRange;
 
     // апроксимация
-    double l1 = 3, l2 = 5, alpha = 90, k = 0.2;
+
     int nx = 6, ny = 6;
     const int base_nx , base_ny;
+    int p;
+    double l1 = 3, l2 = 5, alpha = 90, k = 0.2;
     parral par;
     const int base_nx_rect , base_ny_rect;
     double residual , time;
     int kit = 0;
     bool isActive = false;
 
-    int p = 1;
+
     QVector<QPair<double(*)(double, double), QString>> functions;
     int currentFunctionIndex = 0;
     QTimer computeTimer;

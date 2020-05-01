@@ -20,7 +20,7 @@
       <x>10</x>
       <y>10</y>
       <width>731</width>
-      <height>101</height>
+      <height>91</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -33,18 +33,12 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="l1LineEdit"/>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>l2</string>
          </property>
         </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="l2LineEdit"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_6">
@@ -53,18 +47,46 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="alphaLineEdit"/>
-       </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_7">
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>k</string>
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="l1LineEdit">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="l2LineEdit">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="alphaLineEdit">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="kLineEdit"/>
+        <widget class="QLabel" name="kLineEdit">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -77,9 +99,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="nxLineEdit"/>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
@@ -87,18 +106,39 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="nyLineEdit"/>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label">
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>p</string>
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="nxLineEdit">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="nyLineEdit">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="1">
-        <widget class="QLineEdit" name="pLineEdit"/>
+        <widget class="QLabel" name="pLineEdit">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
