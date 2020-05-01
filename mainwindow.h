@@ -75,6 +75,7 @@ public:
     const int base_nx_rect , base_ny_rect;
     double residual , time;
     int kit = 0;
+    bool isActive = false;
 
     int p = 1;
     QVector<QPair<double(*)(double, double), QString>> functions;

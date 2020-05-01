@@ -93,6 +93,7 @@ MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
             qDebug() << "spasipo, o4en' vkusno";
             freeThreadVars();
             activate();
+            isActive = true;
 
             //            nx = 1 + rand() % 2048;
             //            ny = 1 + rand() % 2048;
@@ -410,8 +411,23 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_1) {
+    if (event->key() == Qt::Key_0 && isActive) {
+        ui->changeFunctionPushButton->animateClick();
+    }
+    if (event->key() == Qt::Key_1 && isActive) {
         changeKit();
+    }
+    if (event->key() == Qt::Key_2) {
+        setZoom(zoom * 2);
+    }
+    if (event->key() == Qt::Key_3) {
+        setZoom(zoom / 2);
+    }
+    if (event->key() == Qt::Key_4 && isActive) {
+        ui->nmlt2_pb->animateClick();
+    }
+    if (event->key() == Qt::Key_5 && isActive) {
+        ui->ndiv2_pb->animateClick();
     }
 }
 
@@ -504,6 +520,7 @@ void MainWindow::redraw() {
 }
 
 int MainWindow::compute() {
+    isActive = false;
     deactivate();
     allocThreadVars();
     approx(p, tids, args);
