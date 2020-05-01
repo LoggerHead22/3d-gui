@@ -67,7 +67,8 @@ MainWindow::MainWindow(int bs_x , int bs_y ,QWidget *parent)
         setParallelogram();
     });
 
-
+    connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::setHorizontalAngle);
+    connect(ui->verticalSlider, &QSlider::valueChanged, this, &MainWindow::setVerticalAngle);
 
 
     ui->l1LineEdit->setText(QString::number(l1));
