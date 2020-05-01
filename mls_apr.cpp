@@ -568,31 +568,30 @@ double residual_compute(double *x , parral &par, double (*f) (double, double) , 
 			}
 		}
 	}
-	if(nx_rect!=0){
-    int begin = k*(nx_rect + 1) / p;
-    int end = (k+1)*(nx_rect + 1) / p;
-	
-	
-	for(int i = nx  - nx_rect + begin ; i <end;i++){
-			if(i==nx){
+    if(nx_rect!=0 && k==0){
+
+        for(int i = nx  - nx_rect; i <=nx;i++){
+            if(i==nx){
+
                 for( int l = 0 ; l < ny - ny_rect ; l++){
-					buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l] , f) - x[I(i,l)] ));
-					buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , (par.ys[l] + par.ys[l+1])/2 , f) - (x[I(i,l)] + x[I(i,l+1)])/2 ));
-					buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l+1], f) - (x[I(i,l+1)]) ));
-				}
-			}else{
+                    buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l] , f) - x[I(i,l)] ));
+                    buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , (par.ys[l] + par.ys[l+1])/2 , f) - (x[I(i,l)] + x[I(i,l+1)])/2 ));
+                    buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l+1], f) - (x[I(i,l+1)]) ));
+                }
+
+            }else{
                 for( int l = 0 ; l < ny - ny_rect ; l++){
-					buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l] , f) - x[I(i,l)] ));
-					buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , (par.ys[l] + par.ys[l+1])/2 , f) - (x[I(i,l)] + x[I(i,l+1)])/2 ));
-					buf[k] = max(buf[k] , abs(par.f_par((par.xs[i] + par.xs[i+1])/2 , (par.ys[l] + par.ys[l+1])/2 , f) - (x[I(i,l)] + x[I(i+1,l+1)])/2 ));
-					buf[k] = max(buf[k] , abs(par.f_par((par.xs[i] + par.xs[i+1])/2 , par.ys[l], f) - (x[I(i,l)] + x[I(i+1,l)])/2 ));
-					buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l+1], f) - (x[I(i,l+1)]) ));
-					buf[k] = max(buf[k] , abs(par.f_par((par.xs[i] + par.xs[i+1])/2 , par.ys[l+1], f) - (x[I(i,l+1)] + x[I(i+1,l+1)])/2));
-					//buf[k] = max(buf[k] , abs(par.f_par((2*par.xs[i] + par.xs[i+1])/3 , (2*par.ys[l+1] + par.ys[l])/3, f) - (x[I(i,l+1)] + x[I(i+1,l+1)] + x[I(i,l)])/3));
-				}
-			}
-		}
-	}
+                    buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l] , f) - x[I(i,l)] ));
+                    buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , (par.ys[l] + par.ys[l+1])/2 , f) - (x[I(i,l)] + x[I(i,l+1)])/2 ));
+                    buf[k] = max(buf[k] , abs(par.f_par((par.xs[i] + par.xs[i+1])/2 , (par.ys[l] + par.ys[l+1])/2 , f) - (x[I(i,l)] + x[I(i+1,l+1)])/2 ));
+                    buf[k] = max(buf[k] , abs(par.f_par((par.xs[i] + par.xs[i+1])/2 , par.ys[l], f) - (x[I(i,l)] + x[I(i+1,l)])/2 ));
+                    buf[k] = max(buf[k] , abs(par.f_par(par.xs[i] , par.ys[l+1], f) - (x[I(i,l+1)]) ));
+                    buf[k] = max(buf[k] , abs(par.f_par((par.xs[i] + par.xs[i+1])/2 , par.ys[l+1], f) - (x[I(i,l+1)] + x[I(i+1,l+1)])/2));
+                    //buf[k] = max(buf[k] , abs(par.f_par((2*par.xs[i] + par.xs[i+1])/3 , (2*par.ys[l+1] + par.ys[l])/3, f) - (x[I(i,l+1)] + x[I(i+1,l+1)] + x[I(i,l)])/3));
+                }
+            }
+        }
+    }
 	
 	
 	reduce_sum(p);
