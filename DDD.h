@@ -1,3 +1,4 @@
+
 #ifndef DDD_H
 #define DDD_H
 
@@ -182,7 +183,7 @@ struct DDD {
         painter.setPen(Qt::black);
     }
 
-    void drawTriangles(const std::vector<Triangle>& triangles) {
+    void drawTriangles(const std::vector<Triangle>& triangles, QColor l, QColor d) {
         for (const auto& it : triangles) {
             const QVector3D& p0 = it.p0;
             const QVector3D& p1 = it.p1;
@@ -193,7 +194,15 @@ struct DDD {
 
             float intensity = QVector3D::dotProduct(normal, light);
             intensity = qMax(0.f, intensity);
-            painter.setBrush(QColor(255, 255 - intensity * 255, 0));
+            int r = d.red() + (l.red() - d.red()) * intensity;
+            int g = d.green() + (l.green() - d.green()) * intensity;
+            int b = d.blue() + (l.blue() - d.blue()) * intensity;
+            int a = d.alpha() + (l.alpha() - d.alpha()) * intensity;
+            r = qMin(qMax(0, r), 255);
+            g = qMin(qMax(0, g), 255);
+            b = qMin(qMax(0, b), 255);
+            a = qMin(qMax(0, a), 255);
+            painter.setBrush(QColor(r, g, b, a));
             fillTriangle(p0, p1, p2);
         }
         painter.setBrush(Qt::black);

@@ -387,24 +387,24 @@ void MainWindow::paintEvent(QPaintEvent* /* event */) {
     ddd.fillPolygon(cut, QColor(64, 128, 255, 64));
 
     painter.setPen(Qt::transparent);
-    if (kit == 0 || kit == 2) {
-        ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect));
-    }
     auto eye = getEye();
+    if (kit == 0 || kit == 2) {
+        ddd.drawTriangles(par.func_trio(getEye(), currentFunction(), xRange, yRange, zRange, size , base_nx, base_ny , base_nx_rect , base_ny_rect), QColor(255, 128, 0), QColor(255, 0, 0));
+    }
     if (x_copy){
 
         if (kit == 1 || kit == 2) {
             std::sort(apr_trio.begin(), apr_trio.end(), [&](const Triangle& a, const Triangle& b) {
                 return (eye - a.center()).length() > (eye - b.center()).length();
             });
-            ddd.drawTriangles(apr_trio);
+            ddd.drawTriangles(apr_trio, QColor(0, 0, 255), QColor(0, 255, 0));
         }
 
         if (kit == 3) {
             std::sort(resid_trio.begin(), resid_trio.end(), [&](const Triangle& a, const Triangle& b) {
                 return (eye - a.center()).length() > (eye - b.center()).length();
             });
-            ddd.drawTriangles(resid_trio);
+            ddd.drawTriangles(resid_trio, QColor(0, 0, 0), QColor(255, 255, 255));
         }
     }
     painter.setPen(Qt::black);
