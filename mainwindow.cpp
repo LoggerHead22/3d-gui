@@ -95,7 +95,7 @@ MainWindow::MainWindow(int bs_x , int bs_y , int p, double l1, double l2, double
     computeTimer.setInterval(300);
     computeTimer.callOnTimeout(this, [&]() {
         if (allThreadsPokushali) {
-            qDebug() << "spasipo, o4en' vkusno";
+        //    qDebug() << "spasipo, o4en' vkusno";
             freeThreadVars();
             activate();
             isActive = true;
@@ -180,41 +180,39 @@ double  MainWindow::f_aprox_value(double x , double y){
     double k1 = (x  - i*par.hx)/par.hx;
     double k2 = (y - j*par.hy) / par.hy;
     double res = 0;
-    bool flag = false;
 
-    if(i == base_nx - base_nx_rect && j == base_ny - base_ny_rect){
-        flag = true;
-       // qDebug()<<"X,Y: "<<x<<y<<"K: "<<k1<<k2;
+    int temp_i = i;
+    double k1_c = k1 , k2_c = k2;
+    if(i==nx || (i==nx - par.nx_rect && j >= ny - par.ny_rect && k2_c > 0)){
+        i--;
+        k1 = 1;
     }
-//    int temp_i = i;
-//    if(i==nx || (i==nx - par.nx_rect && j >= ny - par.ny_rect)){
-//        i--;
-//        k1 = 1;
-//    }
-//    if(j==ny || (temp_i>=nx - par.nx_rect && j == ny - par.ny_rect)){
-//        j--;
-//        k2 = 1;
-//    }
+    if(j==ny || (temp_i>=nx - par.nx_rect && j == ny - par.ny_rect && k1_c > 0)){
+        j--;
+        k2 = 1;
+    }
     if(k1 < 1e-14 && k2 < 1e-14){
         res = x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j)];
     }else if(abs(k1 -1) < 1e-14 && abs(k2 - 1) < 1e-14){
         res = x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1)];
+
     }else if(k2 - k1 > 0){
          k2 = 1 - k2;
-        // qDebug()<<get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j) << i << j;
+
         res = k1*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1)]
          + k2*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j )]
          + (1 - k1 - k2)*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i, j + 1 )];
+
     }else{
         k1 = 1 - k1;
         res = k1*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i , j )]
          + k2*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j + 1 )]
          + (1 - k1 - k2)*x_copy[get_k(par.nx , par.ny , par.nx_rect , par.ny_rect , i + 1, j)];
-    }
-    if(flag){
-        qDebug()<<"ANGLE : "<<res;
 
     }
+
+
+
     return res;
 }
 
@@ -242,12 +240,12 @@ vector<Triangle> MainWindow::func_resid_trio(const QVector3D& size ) {
     };
 
     int L = 60;
-    const int x_size= base_nx*pow(2,int(log2(L/base_nx) + 1));
-    const int y_size =base_ny*pow(2,int(log2(L/base_ny)) + 1);
+    const int x_size= base_nx*pow(2,int(log2(L/min(base_nx, base_ny)) + 1));
+    const int y_size =base_ny*pow(2,int(log2(L/min(base_nx, base_ny))) + 1);
    // qDebug()<<x_size<<y_size;
     double hx_ = par.l2_new / x_size  , hy_ = par.l1_new / y_size;
-    int x_rect = base_nx_rect*pow(2,int(log2(L/base_nx)) + 1);
-    int y_rect = base_ny_rect*pow(2,int(log2(L/base_ny)) + 1);
+    int x_rect = base_nx_rect*pow(2,int(log2(L/min(base_nx, base_ny))) + 1);
+    int y_rect = base_ny_rect*pow(2,int(log2(L/min(base_nx, base_ny))) + 1);
  //   qDebug() <<x_size<<y_size<< x_rect << y_rect;
 
     vector<Triangle> resid_trio;
@@ -300,12 +298,12 @@ vector<Triangle> MainWindow::func_apr_trio(const QVector3D& size ) {
     int N = 60;
     int coef = int(log2(N/base_nx) + 1);
 
-    int x_size= base_nx*pow(2,int(log2(N/base_nx) + 1));
-    int y_size =base_ny*pow(2,int(log2(N/base_ny)) + 1);
+    int x_size= base_nx*pow(2,int(log2(N/min(base_nx, base_ny)) + 1));
+    int y_size =base_ny*pow(2,int(log2(N/min(base_nx, base_ny))) + 1);
 
 
-    int x_rect = base_nx_rect*pow(2,int(log2(N/base_nx) + 1));
-    int y_rect = base_ny_rect*pow(2,int(log2(N/base_ny)) + 1);
+    int x_rect = base_nx_rect*pow(2,int(log2(N/min(base_nx, base_ny)) + 1));
+    int y_rect = base_ny_rect*pow(2,int(log2(N/min(base_nx, base_ny))) + 1);
     coef = nx / x_size;
 
     coef = max(1 , coef);

@@ -113,7 +113,7 @@ struct DDD {
         const QVector3D e = a + ey;
         const QVector3D f = b + ey;
         const QVector3D g = c + ey;
-        const QVector3D h = d + ey;
+        // const QVector3D h = d + ey;
 
         const double xDiff = xRange.second - xRange.first;
         const double yDiff = yRange.second - yRange.first;
